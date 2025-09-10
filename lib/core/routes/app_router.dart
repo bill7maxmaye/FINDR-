@@ -1,0 +1,166 @@
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../features/auth/presentation/bloc/auth_bloc.dart';
+import '../../features/auth/presentation/bloc/auth_state.dart';
+import '../../features/auth/presentation/pages/login_page.dart';
+import '../../features/auth/presentation/pages/register_page.dart';
+import '../../features/home/presentation/pages/home_page.dart';
+import '../../features/profile/presentation/pages/profile_page.dart';
+import '../../features/booking/presentation/pages/bookings_page.dart';
+import '../../features/auth/presentation/pages/forgot_password_page.dart';
+import '../../features/auth/presentation/pages/reset_password_page.dart';
+import '../../features/auth/presentation/pages/verify_email_page.dart';
+
+class AppRouter {
+  static final GoRouter _router = GoRouter(
+    initialLocation: '/',
+    redirect: (context, state) {
+      // Check authentication status
+      final authBloc = context.read<AuthBloc>();
+      final authState = authBloc.state;
+      
+      // If user is authenticated and trying to access auth pages, redirect to home
+      if (authState is AuthAuthenticated) {
+        if (state.uri.path == '/login' || state.uri.path == '/register') {
+          return '/home';
+        }
+      }
+      
+      // If user is not authenticated and trying to access protected pages, redirect to login
+      if (authState is AuthUnauthenticated || authState is AuthInitial) {
+        if (state.uri.path != '/login' && state.uri.path != '/register') {
+          return '/login';
+        }
+      }
+      
+      return null;
+    },
+    routes: [
+      // Auth Routes
+      GoRoute(
+        path: '/login',
+        name: 'login',
+        builder: (context, state) => const LoginPage(),
+      ),
+      GoRoute(
+        path: '/register',
+        name: 'register',
+        builder: (context, state) => const RegisterPage(),
+      ),
+      
+      // Main App Routes
+      GoRoute(
+        path: '/home',
+        name: 'home',
+        builder: (context, state) => const HomePage(),
+      ),
+      GoRoute(
+        path: '/profile',
+        name: 'profile',
+        builder: (context, state) => const ProfilePage(),
+      ),
+      GoRoute(
+        path: '/bookings',
+        name: 'bookings',
+        builder: (context, state) => const BookingsPage(),
+      ),
+      
+      // Additional Routes
+      GoRoute(
+        path: '/edit-profile',
+        name: 'edit-profile',
+        builder: (context, state) => const Scaffold(
+          body: Center(
+            child: Text('Edit Profile Page - Coming Soon'),
+          ),
+        ),
+      ),
+      GoRoute(
+        path: '/change-password',
+        name: 'change-password',
+        builder: (context, state) => const Scaffold(
+          body: Center(
+            child: Text('Change Password Page - Coming Soon'),
+          ),
+        ),
+      ),
+      GoRoute(
+        path: '/forgot-password',
+        name: 'forgot-password',
+        builder: (context, state) => const ForgotPasswordPage(),
+      ),
+
+      GoRoute(
+        path: '/reset-password',
+        name: 'reset-password',
+        builder: (context, state) => ResetPasswordPage(
+          initialToken: state.uri.queryParameters['token'],
+        ),
+      ),
+
+      GoRoute(
+        path: '/verify-email',
+        name: 'verify-email',
+        builder: (context, state) => VerifyEmailPage(
+          token: state.uri.queryParameters['token'],
+        ),
+      ),
+      GoRoute(
+        path: '/service-details',
+        name: 'service-details',
+        builder: (context, state) => const Scaffold(
+          body: Center(
+            child: Text('Service Details Page - Coming Soon'),
+          ),
+        ),
+      ),
+      GoRoute(
+        path: '/booking-details',
+        name: 'booking-details',
+        builder: (context, state) => const Scaffold(
+          body: Center(
+            child: Text('Booking Details Page - Coming Soon'),
+          ),
+        ),
+      ),
+      
+      // Root redirect
+      GoRoute(
+        path: '/',
+        redirect: (context, state) => '/home',
+      ),
+    ],
+    errorBuilder: (context, state) => Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(
+              Icons.error_outline,
+              size: 64,
+              color: Colors.red,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Page Not Found',
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'The page you are looking for does not exist.',
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton(
+              onPressed: () => context.go('/home'),
+              child: const Text('Go Home'),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+  
+  static GoRouter get router => _router;
+}
