@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:service_booking/features/home/presentation/pages/categories_page.dart';
+
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -46,6 +48,14 @@ class _HomeScreenState extends State<HomeScreen> {
           .where((item) => item['name'].toLowerCase().contains(query))
           .toList();
     });
+  }
+
+  // Navigation method to CategoriesPage
+  void _navigateToCategoriesPage(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const CategoriesPage()),
+    );
   }
 
   @override
@@ -169,13 +179,25 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             const SizedBox(height: 24),
 
-            const Text(
-              'Popular Category',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'Popular Category',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                ),
+                TextButton(
+                  onPressed: () => _navigateToCategoriesPage(context),
+                  child: const Text(
+                    'See All',
+                    style: TextStyle(color: Colors.green),
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 12),
 
-            // Square image cards like your screenshot
+            // Square image cards like your screenshot - Now tappable
             GridView.count(
               crossAxisCount: 2,
               shrinkWrap: true,
@@ -183,22 +205,26 @@ class _HomeScreenState extends State<HomeScreen> {
               mainAxisSpacing: 12,
               crossAxisSpacing: 12,
               childAspectRatio: 1, // square
-              children: const [
+              children: [
                 _CategoryCard(
                   title: 'House Cleaning',
                   image: 'assets/images/houseCleaning.jpg',
+                  onTap: () => _navigateToCategoriesPage(context),
                 ),
                 _CategoryCard(
                   title: 'Help Moving',
                   image: 'assets/images/helpMoving.jpg',
+                  onTap: () => _navigateToCategoriesPage(context),
                 ),
                 _CategoryCard(
                   title: 'Painting',
                   image: 'assets/images/painting.jpg',
+                  onTap: () => _navigateToCategoriesPage(context),
                 ),
                 _CategoryCard(
                   title: 'Electrical Help',
                   image: 'assets/images/electricRepair.jpg',
+                  onTap: () => _navigateToCategoriesPage(context),
                 ),
               ],
             ),
@@ -294,45 +320,54 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-// Category Card (unchanged)
+// Updated Category Card to be tappable
 class _CategoryCard extends StatelessWidget {
   final String title;
   final String image;
-  const _CategoryCard({required this.title, required this.image});
+  final VoidCallback onTap;
+
+  const _CategoryCard({
+    required this.title,
+    required this.image,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(14),
-      child: Stack(
-        children: [
-          Image.asset(
-            image,
-            width: double.infinity,
-            height: double.infinity,
-            fit: BoxFit.cover,
-          ),
-          Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Colors.black.withOpacity(0.35), Colors.transparent],
-                begin: Alignment.bottomCenter,
-                end: Alignment.topCenter,
+    return GestureDetector(
+      onTap: onTap,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(14),
+        child: Stack(
+          children: [
+            Image.asset(
+              image,
+              width: double.infinity,
+              height: double.infinity,
+              fit: BoxFit.cover,
+            ),
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Colors.black.withOpacity(0.35), Colors.transparent],
+                  begin: Alignment.bottomCenter,
+                  end: Alignment.topCenter,
+                ),
               ),
             ),
-          ),
-          Positioned(
-            left: 12,
-            bottom: 12,
-            child: Text(
-              title,
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
+            Positioned(
+              left: 12,
+              bottom: 12,
+              child: Text(
+                title,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -455,3 +490,4 @@ class _TaskerCard extends StatelessWidget {
     );
   }
 }
+
