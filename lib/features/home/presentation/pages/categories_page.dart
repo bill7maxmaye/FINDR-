@@ -1,7 +1,11 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class CategoriesPage extends StatefulWidget {
-  const CategoriesPage({Key? key}) : super(key: key);
+  final String mainCategory;
+  const CategoriesPage({Key? key, required this.mainCategory})
+    : super(key: key);
 
   @override
   State<CategoriesPage> createState() => _CategoriesPageState();
@@ -9,48 +13,63 @@ class CategoriesPage extends StatefulWidget {
 
 class _CategoriesPageState extends State<CategoriesPage> {
   final TextEditingController _searchController = TextEditingController();
-  final List<Map<String, dynamic>> _categoriesData = [
-    {'name': 'Ac Repair', 'icon': Icons.ac_unit},
-    {'name': 'Cleaning', 'icon': Icons.cleaning_services},
-    {'name': 'Carpenter', 'icon': Icons.handyman},
-    {'name': 'Cooking', 'icon': Icons.restaurant},
-    {'name': 'Electrician', 'icon': Icons.electrical_services},
-    {'name': 'Painter', 'icon': Icons.format_paint},
-    {'name': 'Plumber', 'icon': Icons.plumbing},
-    {'name': 'Salon', 'icon': Icons.content_cut},
-    {'name': 'Ac Repair', 'icon': Icons.ac_unit},
-    {'name': 'Cleaning', 'icon': Icons.cleaning_services},
-    {'name': 'Carpenter', 'icon': Icons.handyman},
-    {'name': 'Cooking', 'icon': Icons.restaurant},
-    {'name': 'Electrician', 'icon': Icons.electrical_services},
-    {'name': 'Painter', 'icon': Icons.format_paint},
-    {'name': 'Plumber', 'icon': Icons.plumbing},
-    {'name': 'Salon', 'icon': Icons.content_cut},
-    {'name': 'Ac Repair', 'icon': Icons.ac_unit},
-    {'name': 'Cleaning', 'icon': Icons.cleaning_services},
-  ];
-  late List<Map<String, dynamic>> _filteredCategories;
+  List<Map<String, dynamic>> _subCategories = [];
+  List<Map<String, dynamic>> _filteredCategories = [];
 
   @override
   void initState() {
     super.initState();
-    _filteredCategories = List.from(_categoriesData);
+    _loadSubCategories();
     _searchController.addListener(_onSearchChanged);
+  }
+
+  Future<void> _loadSubCategories() async {
+    final String data = await rootBundle.loadString(
+      'assets/subcategories.json',
+    );
+    final Map<String, dynamic> jsonResult = json.decode(data);
+    final List subCats = jsonResult[widget.mainCategory] ?? [];
+    setState(() {
+      _subCategories = subCats
+          .map<Map<String, dynamic>>(
+            (item) => {
+              'name': item['name'],
+              'icon': _iconFromString(item['icon']),
+            },
+          )
+          .toList();
+      _filteredCategories = List.from(_subCategories);
+    });
+  }
+
+  IconData _iconFromString(String iconName) {
+    switch (iconName) {
+      case 'cleaning_services':
+        return Icons.cleaning_services;
+      case 'handyman':
+        return Icons.handyman;
+      case 'format_paint':
+        return Icons.format_paint;
+      case 'electrical_services':
+        return Icons.electrical_services;
+      default:
+        return Icons.category;
+    }
+  }
+
+  void _onSearchChanged() {
+    String query = _searchController.text.toLowerCase();
+    setState(() {
+      _filteredCategories = _subCategories
+          .where((cat) => cat['name'].toLowerCase().contains(query))
+          .toList();
+    });
   }
 
   @override
   void dispose() {
     _searchController.dispose();
     super.dispose();
-  }
-
-  void _onSearchChanged() {
-    String query = _searchController.text.toLowerCase();
-    setState(() {
-      _filteredCategories = _categoriesData
-          .where((cat) => cat['name'].toLowerCase().contains(query))
-          .toList();
-    });
   }
 
   @override
@@ -64,9 +83,12 @@ class _CategoriesPageState extends State<CategoriesPage> {
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: const Text(
-          'Categories',
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+        title: Text(
+          widget.mainCategory,
+          style: const TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         centerTitle: true,
         actions: [
@@ -109,14 +131,15 @@ class _CategoriesPageState extends State<CategoriesPage> {
               ),
             ),
             const SizedBox(height: 20),
-            // Categories Grid
+            // Categories Grid - Fixed overflow by reducing childAspectRatio
             Expanded(
               child: GridView.builder(
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 4,
-                  crossAxisSpacing: 16,
-                  mainAxisSpacing: 16,
-                  childAspectRatio: 0.85,
+                  crossAxisSpacing: 12, // Reduced spacing
+                  mainAxisSpacing: 12, // Reduced spacing
+                  childAspectRatio:
+                      0.75, // Reduced from 0.85 to prevent overflow
                 ),
                 itemCount: _filteredCategories.length,
                 itemBuilder: (context, index) {
@@ -125,7 +148,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
                     icon: cat['icon'],
                     label: cat['name'],
                     onTap: () {
-                      // Handle category tap
+                      // Handle subcategory tap
                     },
                   );
                 },
@@ -153,27 +176,45 @@ class _CategoryItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              color: Colors.grey[100],
-              borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.all(4), // Reduced padding
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Container(
+              width: 40, // Reduced size
+              height: 40, // Reduced size
+              decoration: BoxDecoration(
+                color: Colors.grey[100],
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(
+                icon,
+                size: 24,
+                color: Colors.black87,
+              ), // Reduced icon size
             ),
-            child: Icon(icon, size: 28, color: Colors.black87),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            label,
-            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-            textAlign: TextAlign.center,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
+            const SizedBox(height: 6), // Reduced spacing
+            // Constrained text widget to prevent overflow
+            ConstrainedBox(
+              constraints: const BoxConstraints(
+                maxWidth: 70, // Slightly reduced for better fitting
+              ),
+              child: Text(
+                label,
+                style: const TextStyle(
+                  fontSize: 11, // Slightly reduced font size
+                  fontWeight: FontWeight.w500,
+                  height: 1.1, // Reduced line height
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:service_booking/features/home/presentation/pages/categories_page.dart';
@@ -13,8 +12,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  List<dynamic> _subcategories = [];
-  List<dynamic> _filteredSubcategories = [];
+  List<Map<String, dynamic>> _subcategories = [];
+  List<Map<String, dynamic>> _filteredSubcategories = [];
   TextEditingController _searchController = TextEditingController();
 
   @override
@@ -31,13 +30,22 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _loadSubcategories() async {
-    final String response = await rootBundle.loadString(
-      'assets/subcategories.json',
-    );
-    final data = await json.decode(response);
+    final String response = await rootBundle.loadString('assets/subcategories.json');
+    final Map<String, dynamic> data = json.decode(response);
+    // Flatten all subcategories from all main categories
+    final List<Map<String, dynamic>> allSubs = [];
+    data.forEach((mainCat, subs) {
+      for (var sub in subs) {
+        allSubs.add({
+          'name': sub['name'],
+          'mainCategory': mainCat,
+          'icon': sub['icon'],
+        });
+      }
+    });
     setState(() {
-      _subcategories = data;
-      _filteredSubcategories = data;
+      _subcategories = allSubs;
+      _filteredSubcategories = allSubs;
     });
   }
 
@@ -51,10 +59,12 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   // Navigation method to CategoriesPage
-  void _navigateToCategoriesPage(BuildContext context) {
+  void _navigateToCategoriesPage(BuildContext context, String mainCategory) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const CategoriesPage()),
+      MaterialPageRoute(
+        builder: (context) => CategoriesPage(mainCategory: mainCategory),
+      ),
     );
   }
 
@@ -169,7 +179,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           final sub = _filteredSubcategories[index];
                           return ListTile(
                             title: Text(sub['name']),
-                            subtitle: Text(sub['category']),
+                            subtitle: Text(sub['mainCategory']),
                             onTap: () {
                               // You can handle subcategory tap here
                             },
@@ -187,7 +197,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                 ),
                 TextButton(
-                  onPressed: () => _navigateToCategoriesPage(context),
+                  onPressed: () => _navigateToCategoriesPage(context, ''),
                   child: const Text(
                     'See All',
                     style: TextStyle(color: Colors.green),
@@ -209,22 +219,22 @@ class _HomeScreenState extends State<HomeScreen> {
                 _CategoryCard(
                   title: 'House Cleaning',
                   image: 'assets/images/houseCleaning.jpg',
-                  onTap: () => _navigateToCategoriesPage(context),
+                  onTap: () => _navigateToCategoriesPage(context, 'House Cleaning'),
                 ),
                 _CategoryCard(
                   title: 'Help Moving',
                   image: 'assets/images/helpMoving.jpg',
-                  onTap: () => _navigateToCategoriesPage(context),
+                  onTap: () => _navigateToCategoriesPage(context, 'Help Moving'),
                 ),
                 _CategoryCard(
                   title: 'Painting',
                   image: 'assets/images/painting.jpg',
-                  onTap: () => _navigateToCategoriesPage(context),
+                  onTap: () => _navigateToCategoriesPage(context, 'Painting'),
                 ),
                 _CategoryCard(
                   title: 'Electrical Help',
                   image: 'assets/images/electricRepair.jpg',
-                  onTap: () => _navigateToCategoriesPage(context),
+                  onTap: () => _navigateToCategoriesPage(context, 'Electrical Help'),
                 ),
               ],
             ),
