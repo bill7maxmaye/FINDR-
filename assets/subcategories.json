@@ -1,21 +1,21 @@
 {
   "House Cleaning": [
-    {"name": "Deep Cleaning", "icon": "cleaning_services"},
-    {"name": "Window Cleaning", "icon": "cleaning_services"},
-    {"name": "Move In/Out Cleaning", "icon": "cleaning_services"}
+    { "name": "Deep Cleaning", "icon": "cleaning_services" },
+    { "name": "Window Cleaning", "icon": "cleaning_services" },
+    { "name": "Move In/Out Cleaning", "icon": "cleaning_services" }
   ],
   "Help Moving": [
-    {"name": "Packing", "icon": "handyman"},
-    {"name": "Unpacking", "icon": "handyman"},
-    {"name": "Furniture Assembly", "icon": "handyman"}
+    { "name": "Packing", "icon": "handyman" },
+    { "name": "Unpacking", "icon": "handyman" },
+    { "name": "Furniture Assembly", "icon": "handyman" }
   ],
   "Painting": [
-    {"name": "Wall Painting", "icon": "format_paint"},
-    {"name": "Furniture Painting", "icon": "format_paint"}
+    { "name": "Wall Painting", "icon": "format_paint" },
+    { "name": "Furniture Painting", "icon": "format_paint" }
   ],
   "Electrical Help": [
-    {"name": "Wiring", "icon": "electrical_services"},
-    {"name": "Lighting", "icon": "electrical_services"},
-    {"name": "Appliance Repair", "icon": "electrical_services"}
+    { "name": "Wiring", "icon": "electrical_services" },
+    { "name": "Lighting", "icon": "electrical_services" },
+    { "name": "Appliance Repair", "icon": "electrical_services" }
   ]
 }

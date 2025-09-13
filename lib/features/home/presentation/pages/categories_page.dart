@@ -15,25 +15,43 @@ class _CategoriesPageState extends State<CategoriesPage> {
   final TextEditingController _searchController = TextEditingController();
   List<Map<String, dynamic>> _subCategories = [];
   List<Map<String, dynamic>> _filteredCategories = [];
+  List<Map<String, dynamic>> _allSubcategories = [];
 
   @override
   void initState() {
     super.initState();
-    _loadSubCategories();
+    _loadAllSubcategories();
     _searchController.addListener(_onSearchChanged);
   }
 
-  Future<void> _loadSubCategories() async {
+  Future<void> _loadAllSubcategories() async {
     final String data = await rootBundle.loadString(
       'assets/subcategories.json',
     );
     final Map<String, dynamic> jsonResult = json.decode(data);
+
+    // Load all subcategories from all main categories for search
+    final List<Map<String, dynamic>> allSubs = [];
+    jsonResult.forEach((mainCat, subs) {
+      for (var sub in subs) {
+        allSubs.add({
+          'name': sub['name'],
+          'mainCategory': mainCat,
+          'icon': _iconFromString(sub['icon']),
+        });
+      }
+    });
+
+    // Load specific subcategories for the current main category
     final List subCats = jsonResult[widget.mainCategory] ?? [];
+
     setState(() {
+      _allSubcategories = allSubs;
       _subCategories = subCats
           .map<Map<String, dynamic>>(
             (item) => {
               'name': item['name'],
+              'mainCategory': widget.mainCategory,
               'icon': _iconFromString(item['icon']),
             },
           )
@@ -60,9 +78,15 @@ class _CategoriesPageState extends State<CategoriesPage> {
   void _onSearchChanged() {
     String query = _searchController.text.toLowerCase();
     setState(() {
-      _filteredCategories = _subCategories
-          .where((cat) => cat['name'].toLowerCase().contains(query))
-          .toList();
+      if (query.isEmpty) {
+        // Show grid view with current category's subcategories
+        _filteredCategories = List.from(_subCategories);
+      } else {
+        // Show search results from ALL subcategories
+        _filteredCategories = _allSubcategories
+            .where((cat) => cat['name'].toLowerCase().contains(query))
+            .toList();
+      }
     });
   }
 
@@ -131,32 +155,67 @@ class _CategoriesPageState extends State<CategoriesPage> {
               ),
             ),
             const SizedBox(height: 20),
-            // Categories Grid - Fixed overflow by reducing childAspectRatio
+
+            // Show search results or grid based on search state
             Expanded(
-              child: GridView.builder(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 4,
-                  crossAxisSpacing: 12, // Reduced spacing
-                  mainAxisSpacing: 12, // Reduced spacing
-                  childAspectRatio:
-                      0.75, // Reduced from 0.85 to prevent overflow
-                ),
-                itemCount: _filteredCategories.length,
-                itemBuilder: (context, index) {
-                  final cat = _filteredCategories[index];
-                  return _CategoryItem(
-                    icon: cat['icon'],
-                    label: cat['name'],
-                    onTap: () {
-                      // Handle subcategory tap
-                    },
-                  );
-                },
-              ),
+              child: _searchController.text.isNotEmpty
+                  ? _buildSearchResults()
+                  : _buildCategoriesGrid(),
             ),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildSearchResults() {
+    return _filteredCategories.isEmpty
+        ? const Center(child: Text('No subcategories found'))
+        : ListView.builder(
+            itemCount: _filteredCategories.length,
+            itemBuilder: (context, index) {
+              final sub = _filteredCategories[index];
+              return ListTile(
+                leading: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[100],
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(sub['icon'], size: 24, color: Colors.black87),
+                ),
+                title: Text(sub['name']),
+                subtitle: Text(sub['mainCategory']),
+                onTap: () {
+                  // Handle subcategory tap from search results
+                  print('${sub['name']} from ${sub['mainCategory']} tapped');
+                },
+              );
+            },
+          );
+  }
+
+  Widget _buildCategoriesGrid() {
+    return GridView.builder(
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 4,
+        crossAxisSpacing: 12,
+        mainAxisSpacing: 12,
+        childAspectRatio: 0.75,
+      ),
+      itemCount: _filteredCategories.length,
+      itemBuilder: (context, index) {
+        final cat = _filteredCategories[index];
+        return _CategoryItem(
+          icon: cat['icon'],
+          label: cat['name'],
+          onTap: () {
+            // Handle subcategory tap from grid
+            print('${cat['name']} tapped');
+          },
+        );
+      },
     );
   }
 }
@@ -177,36 +236,29 @@ class _CategoryItem extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(4), // Reduced padding
+        padding: const EdgeInsets.all(4),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Container(
-              width: 40, // Reduced size
-              height: 40, // Reduced size
+              width: 40,
+              height: 40,
               decoration: BoxDecoration(
                 color: Colors.grey[100],
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: Icon(
-                icon,
-                size: 24,
-                color: Colors.black87,
-              ), // Reduced icon size
+              child: Icon(icon, size: 24, color: Colors.black87),
             ),
-            const SizedBox(height: 6), // Reduced spacing
-            // Constrained text widget to prevent overflow
+            const SizedBox(height: 6),
             ConstrainedBox(
-              constraints: const BoxConstraints(
-                maxWidth: 70, // Slightly reduced for better fitting
-              ),
+              constraints: const BoxConstraints(maxWidth: 70),
               child: Text(
                 label,
                 style: const TextStyle(
-                  fontSize: 11, // Slightly reduced font size
+                  fontSize: 11,
                   fontWeight: FontWeight.w500,
-                  height: 1.1, // Reduced line height
+                  height: 1.1,
                 ),
                 textAlign: TextAlign.center,
                 maxLines: 2,
