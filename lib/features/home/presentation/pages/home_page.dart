@@ -1,8 +1,7 @@
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'dart:convert';
 import 'package:flutter/services.dart';
-
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -30,7 +29,9 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _loadSubcategories() async {
-    final String response = await rootBundle.loadString('assets/subcategories.json');
+    final String response = await rootBundle.loadString(
+      'assets/subcategories.json',
+    );
     final data = await json.decode(response);
     setState(() {
       _subcategories = data;
@@ -41,16 +42,15 @@ class _HomeScreenState extends State<HomeScreen> {
   void _onSearchChanged() {
     String query = _searchController.text.toLowerCase();
     setState(() {
-      _filteredSubcategories = _subcategories.where((item) =>
-        item['name'].toLowerCase().contains(query)
-      ).toList();
+      _filteredSubcategories = _subcategories
+          .where((item) => item['name'].toLowerCase().contains(query))
+          .toList();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-
-  return Scaffold(
+    return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,

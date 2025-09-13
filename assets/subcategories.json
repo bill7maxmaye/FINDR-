@@ -1,10 +1,10 @@
 [
-  {"id": 1, "name": "Plumbing", "category": "Home Repair"},
-  {"id": 2, "name": "Electrical", "category": "Home Repair"},
-  {"id": 3, "name": "Deep Cleaning", "category": "Cleaning"},
-  {"id": 4, "name": "Window Cleaning", "category": "Cleaning"},
-  {"id": 5, "name": "Wall Painting", "category": "Painting"},
-  {"id": 6, "name": "Furniture Painting", "category": "Painting"},
-  {"id": 7, "name": "Packing", "category": "Moving"},
-  {"id": 8, "name": "Unpacking", "category": "Moving"}
+  { "id": 1, "name": "Plumbing", "category": "Home Repair" },
+  { "id": 2, "name": "Electrical", "category": "Home Repair" },
+  { "id": 3, "name": "Deep Cleaning", "category": "Cleaning" },
+  { "id": 4, "name": "Window Cleaning", "category": "Cleaning" },
+  { "id": 5, "name": "Wall Painting", "category": "Painting" },
+  { "id": 6, "name": "Furniture Painting", "category": "Painting" },
+  { "id": 7, "name": "Packing", "category": "Moving" },
+  { "id": 8, "name": "Unpacking", "category": "Moving" }
 ]
