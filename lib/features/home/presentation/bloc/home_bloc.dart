@@ -1,24 +1,29 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../data/datasources/home_api.dart';
+import '../../data/repositories/home_repository_impl.dart';
 import '../../domain/repositories/home_repository.dart';
 import '../../domain/usecases/get_services.dart';
+import '../../../../core/network/api_client.dart';
 import 'home_event.dart';
 import 'home_state.dart';
 
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
-  final GetServices _getServices;
-  final HomeRepository _homeRepository;
+  late final GetServices _getServices;
+  late final HomeRepository _homeRepository;
 
-  HomeBloc({
-    required GetServices getServices,
-    required HomeRepository homeRepository,
-  })  : _getServices = getServices,
-        _homeRepository = homeRepository,
-        super(HomeInitial()) {
+  HomeBloc() : super(HomeInitial()) {
+    _initializeDependencies();
     on<HomeLoadServices>(_onLoadServices);
     on<HomeLoadCategories>(_onLoadCategories);
     on<HomeSearchServices>(_onSearchServices);
     on<HomeFilterByCategory>(_onFilterByCategory);
     on<HomeClearFilters>(_onClearFilters);
+  }
+
+  void _initializeDependencies() {
+    final homeApi = HomeApiImpl(ApiClient());
+    _homeRepository = HomeRepositoryImpl(homeApi);
+    _getServices = GetServices(_homeRepository);
   }
 
   Future<void> _onLoadServices(

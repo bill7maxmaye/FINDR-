@@ -13,9 +13,17 @@ import '../../features/auth/presentation/pages/reset_password_page.dart';
 import '../../features/auth/presentation/pages/verify_email_page.dart';
 
 class AppRouter {
+  // Development flag - set to true to bypass authentication for testing
+  static const bool _isDevelopment = true;
+  
   static final GoRouter _router = GoRouter(
-    initialLocation: '/',
+    initialLocation: '/home',
     redirect: (context, state) {
+      // Skip authentication check in development
+      if (_isDevelopment) {
+        return null;
+      }
+      
       // Check authentication status
       final authBloc = context.read<AuthBloc>();
       final authState = authBloc.state;

@@ -1,27 +1,23 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../data/datasources/auth_api.dart';
+import '../../data/repositories/auth_repository_impl.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../../domain/usecases/login_user.dart';
 import '../../domain/usecases/register_user.dart';
 import '../../domain/usecases/logout_user.dart';
+import '../../../../core/network/dio_client.dart';
+import '../../../../core/utils/storage_service.dart';
 import 'auth_event.dart';
 import 'auth_state.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
-  final LoginUser _loginUser;
-  final RegisterUser _registerUser;
-  final LogoutUser _logoutUser;
-  final AuthRepository _authRepository;
+  late final LoginUser _loginUser;
+  late final RegisterUser _registerUser;
+  late final LogoutUser _logoutUser;
+  late final AuthRepository _authRepository;
 
-  AuthBloc({
-    required LoginUser loginUser,
-    required RegisterUser registerUser,
-    required LogoutUser logoutUser,
-    required AuthRepository authRepository,
-  })  : _loginUser = loginUser,
-        _registerUser = registerUser,
-        _logoutUser = logoutUser,
-        _authRepository = authRepository,
-        super(AuthInitial()) {
+  AuthBloc() : super(AuthInitial()) {
+    _initializeDependencies();
     on<AuthLoginRequested>(_onLoginRequested);
     on<AuthRegisterRequested>(_onRegisterRequested);
     on<AuthLogoutRequested>(_onLogoutRequested);
@@ -32,6 +28,16 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AuthVerifyEmailRequested>(_onVerifyEmailRequested);
     on<AuthResendVerificationRequested>(_onResendVerificationRequested);
     on<AuthResendVerificationEmailRequested>(_onResendVerificationEmailRequested);
+  }
+
+  void _initializeDependencies() {
+    final dioClient = DioClient();
+    final storageService = StorageService();
+    final authApi = AuthApiImpl(dioClient);
+    _authRepository = AuthRepositoryImpl(authApi, storageService);
+    _loginUser = LoginUser(_authRepository);
+    _registerUser = RegisterUser(_authRepository);
+    _logoutUser = LogoutUser(_authRepository);
   }
 
   Future<void> _onLoginRequested(

@@ -1,24 +1,29 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../data/datasources/profile_api.dart';
+import '../../data/repositories/profile_repository_impl.dart';
 import '../../domain/repositories/profile_repository.dart';
 import '../../domain/usecases/update_profile.dart';
+import '../../../../core/network/api_client.dart';
 import 'profile_event.dart';
 import 'profile_state.dart';
 
 class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
-  final UpdateProfile _updateProfile;
-  final ProfileRepository _profileRepository;
+  late final UpdateProfile _updateProfile;
+  late final ProfileRepository _profileRepository;
 
-  ProfileBloc({
-    required UpdateProfile updateProfile,
-    required ProfileRepository profileRepository,
-  })  : _updateProfile = updateProfile,
-        _profileRepository = profileRepository,
-        super(ProfileInitial()) {
+  ProfileBloc() : super(ProfileInitial()) {
+    _initializeDependencies();
     on<ProfileLoadUser>(_onLoadUser);
     on<ProfileUpdateProfile>(_onUpdateProfile);
     on<ProfileChangePassword>(_onChangePassword);
     on<ProfileDeleteAccount>(_onDeleteAccount);
     on<ProfileUploadImage>(_onUploadImage);
+  }
+
+  void _initializeDependencies() {
+    final profileApi = ProfileApiImpl(ApiClient());
+    _profileRepository = ProfileRepositoryImpl(profileApi);
+    _updateProfile = UpdateProfile(_profileRepository);
   }
 
   Future<void> _onLoadUser(

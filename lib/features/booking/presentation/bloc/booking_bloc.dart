@@ -1,25 +1,30 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../domain/entities/booking.dart';
+import '../../data/datasources/booking_api.dart';
+import '../../data/repositories/booking_repository_impl.dart';
 import '../../domain/repositories/booking_repository.dart';
 import '../../domain/usecases/create_booking.dart';
+import '../../../../core/network/api_client.dart';
 import 'booking_event.dart';
 import 'booking_state.dart';
 
 class BookingBloc extends Bloc<BookingEvent, BookingState> {
-  final CreateBooking _createBooking;
-  final BookingRepository _bookingRepository;
+  late final CreateBooking _createBooking;
+  late final BookingRepository _bookingRepository;
 
-  BookingBloc({
-    required CreateBooking createBooking,
-    required BookingRepository bookingRepository,
-  })  : _createBooking = createBooking,
-        _bookingRepository = bookingRepository,
-        super(BookingInitial()) {
+  BookingBloc() : super(BookingInitial()) {
+    _initializeDependencies();
     on<BookingLoadUserBookings>(_onLoadUserBookings);
     on<BookingCreateBooking>(_onCreateBooking);
     on<BookingUpdateBooking>(_onUpdateBooking);
     on<BookingCancelBooking>(_onCancelBooking);
     on<BookingLoadBookingById>(_onLoadBookingById);
+  }
+
+  void _initializeDependencies() {
+    final bookingApi = BookingApiImpl(ApiClient());
+    _bookingRepository = BookingRepositoryImpl(bookingApi);
+    _createBooking = CreateBooking(_bookingRepository);
   }
 
   Future<void> _onLoadUserBookings(

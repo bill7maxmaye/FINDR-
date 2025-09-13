@@ -112,7 +112,6 @@ lib/
 
 - **Clean Architecture**: Separation of concerns with clear layer boundaries
 - **BLoC State Management**: Reactive state management with events and states
-- **Dependency Injection**: Service locator pattern for loose coupling
 - **API Integration**: RESTful API client with error handling
 - **Local Storage**: Secure local data persistence
 - **Input Validation**: Comprehensive form validation
@@ -124,7 +123,6 @@ lib/
 ### Core Dependencies
 
 - `flutter_bloc`: State management
-- `get_it`: Dependency injection
 - `go_router`: Declarative routing
 - `http`: HTTP client
 - `shared_preferences`: Local storage
@@ -152,13 +150,7 @@ lib/
    flutter pub get
    ```
 
-3. **Run code generation** (if needed)
-
-   ```bash
-   flutter packages pub run build_runner build
-   ```
-
-4. **Run the app**
+3. **Run the app**
    ```bash
    flutter run
    ```
