@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+import 'core/network/dio_client.dart';
 import 'core/routes/app_router.dart';
 import 'core/theme.dart';
-import 'core/network/dio_client.dart';
 import 'core/utils/storage_service.dart';
 import 'features/auth/presentation/bloc/auth_bloc.dart';
-import 'features/home/presentation/bloc/home_bloc.dart';
 import 'features/booking/presentation/bloc/booking_bloc.dart';
+import 'features/home/presentation/bloc/home_bloc.dart';
 import 'features/profile/presentation/bloc/profile_bloc.dart';
 
 Future<void> main() async {
@@ -26,18 +27,10 @@ class ServiceBookingApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider<AuthBloc>(
-          create: (_) => AuthBloc(),
-        ),
-        BlocProvider<HomeBloc>(
-          create: (_) => HomeBloc(),
-        ),
-        BlocProvider<BookingBloc>(
-          create: (_) => BookingBloc(),
-        ),
-        BlocProvider<ProfileBloc>(
-          create: (_) => ProfileBloc(),
-        ),
+        BlocProvider<AuthBloc>(create: (_) => AuthBloc()),
+        BlocProvider<HomeBloc>(create: (_) => HomeBloc()),
+        BlocProvider<BookingBloc>(create: (_) => BookingBloc()),
+        BlocProvider<ProfileBloc>(create: (_) => ProfileBloc()),
       ],
       child: MaterialApp.router(
         title: 'Service Booking',
@@ -50,4 +43,3 @@ class ServiceBookingApp extends StatelessWidget {
     );
   }
 }
-
