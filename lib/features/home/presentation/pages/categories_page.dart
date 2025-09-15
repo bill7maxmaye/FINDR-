@@ -42,21 +42,27 @@ class _CategoriesPageState extends State<CategoriesPage> {
       }
     });
 
-    // Load specific subcategories for the current main category
-    final List subCats = jsonResult[widget.mainCategory] ?? [];
-
     setState(() {
       _allSubcategories = allSubs;
-      _subCategories = subCats
-          .map<Map<String, dynamic>>(
-            (item) => {
-              'name': item['name'],
-              'mainCategory': widget.mainCategory,
-              'icon': _iconFromString(item['icon']),
-            },
-          )
-          .toList();
-      _filteredCategories = List.from(_subCategories);
+      
+      // If mainCategory is empty, show all subcategories
+      if (widget.mainCategory.isEmpty) {
+        _subCategories = allSubs;
+        _filteredCategories = List.from(allSubs);
+      } else {
+        // Load specific subcategories for the current main category
+        final List subCats = jsonResult[widget.mainCategory] ?? [];
+        _subCategories = subCats
+            .map<Map<String, dynamic>>(
+              (item) => {
+                'name': item['name'],
+                'mainCategory': widget.mainCategory,
+                'icon': _iconFromString(item['icon']),
+              },
+            )
+            .toList();
+        _filteredCategories = List.from(_subCategories);
+      }
     });
   }
 
@@ -70,6 +76,14 @@ class _CategoriesPageState extends State<CategoriesPage> {
         return Icons.format_paint;
       case 'electrical_services':
         return Icons.electrical_services;
+      case 'ac_unit':
+        return Icons.ac_unit;
+      case 'restaurant':
+        return Icons.restaurant;
+      case 'plumbing':
+        return Icons.plumbing;
+      case 'content_cut':
+        return Icons.content_cut;
       default:
         return Icons.category;
     }
@@ -108,7 +122,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
-          widget.mainCategory,
+          widget.mainCategory.isEmpty ? 'Categories' : widget.mainCategory,
           style: const TextStyle(
             color: Colors.black,
             fontWeight: FontWeight.bold,

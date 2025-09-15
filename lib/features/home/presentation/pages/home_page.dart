@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:service_booking/features/home/presentation/pages/categories_page.dart';
 
-
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
@@ -30,7 +29,9 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _loadSubcategories() async {
-    final String response = await rootBundle.loadString('assets/subcategories.json');
+    final String response = await rootBundle.loadString(
+      'assets/subcategories.json',
+    );
     final Map<String, dynamic> data = json.decode(response);
     // Flatten all subcategories from all main categories
     final List<Map<String, dynamic>> allSubs = [];
@@ -39,7 +40,7 @@ class _HomeScreenState extends State<HomeScreen> {
         allSubs.add({
           'name': sub['name'],
           'mainCategory': mainCat,
-          'icon': sub['icon'],
+          'icon': _iconFromString(sub['icon']),
         });
       }
     });
@@ -47,6 +48,29 @@ class _HomeScreenState extends State<HomeScreen> {
       _subcategories = allSubs;
       _filteredSubcategories = allSubs;
     });
+  }
+
+  IconData _iconFromString(String iconName) {
+    switch (iconName) {
+      case 'cleaning_services':
+        return Icons.cleaning_services;
+      case 'handyman':
+        return Icons.handyman;
+      case 'format_paint':
+        return Icons.format_paint;
+      case 'electrical_services':
+        return Icons.electrical_services;
+      case 'ac_unit':
+        return Icons.ac_unit;
+      case 'restaurant':
+        return Icons.restaurant;
+      case 'plumbing':
+        return Icons.plumbing;
+      case 'content_cut':
+        return Icons.content_cut;
+      default:
+        return Icons.category;
+    }
   }
 
   void _onSearchChanged() {
@@ -58,7 +82,7 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  // Navigation method to CategoriesPage
+  // Navigation method to CategoriesPage - Updated to show all categories when mainCategory is empty
   void _navigateToCategoriesPage(BuildContext context, String mainCategory) {
     Navigator.push(
       context,
@@ -153,7 +177,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ),
             ),
-            // Show filtered subcategories
+            // Show filtered subcategories with icons
             if (_searchController.text.isNotEmpty)
               Container(
                 margin: const EdgeInsets.only(top: 8),
@@ -178,10 +202,27 @@ class _HomeScreenState extends State<HomeScreen> {
                         itemBuilder: (context, index) {
                           final sub = _filteredSubcategories[index];
                           return ListTile(
+                            leading: Container(
+                              width: 40,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[100],
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Icon(
+                                sub['icon'],
+                                size: 24,
+                                color: Colors.black87,
+                              ),
+                            ),
                             title: Text(sub['name']),
                             subtitle: Text(sub['mainCategory']),
                             onTap: () {
-                              // You can handle subcategory tap here
+                              // Navigate to the specific category page
+                              _navigateToCategoriesPage(
+                                context,
+                                sub['mainCategory'],
+                              );
                             },
                           );
                         },
@@ -219,12 +260,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 _CategoryCard(
                   title: 'House Cleaning',
                   image: 'assets/images/houseCleaning.jpg',
-                  onTap: () => _navigateToCategoriesPage(context, 'House Cleaning'),
+                  onTap: () =>
+                      _navigateToCategoriesPage(context, 'House Cleaning'),
                 ),
                 _CategoryCard(
                   title: 'Help Moving',
                   image: 'assets/images/helpMoving.jpg',
-                  onTap: () => _navigateToCategoriesPage(context, 'Help Moving'),
+                  onTap: () =>
+                      _navigateToCategoriesPage(context, 'Help Moving'),
                 ),
                 _CategoryCard(
                   title: 'Painting',
@@ -234,7 +277,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 _CategoryCard(
                   title: 'Electrical Help',
                   image: 'assets/images/electricRepair.jpg',
-                  onTap: () => _navigateToCategoriesPage(context, 'Electrical Help'),
+                  onTap: () =>
+                      _navigateToCategoriesPage(context, 'Electrical Help'),
                 ),
               ],
             ),
@@ -500,4 +544,3 @@ class _TaskerCard extends StatelessWidget {
     );
   }
 }
-

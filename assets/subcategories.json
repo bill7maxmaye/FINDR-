@@ -2,20 +2,86 @@
   "House Cleaning": [
     { "name": "Deep Cleaning", "icon": "cleaning_services" },
     { "name": "Window Cleaning", "icon": "cleaning_services" },
-    { "name": "Move In/Out Cleaning", "icon": "cleaning_services" }
+    { "name": "Move In/Out Cleaning", "icon": "cleaning_services" },
+    { "name": "Carpet Cleaning", "icon": "cleaning_services" },
+    { "name": "Kitchen Cleaning", "icon": "cleaning_services" },
+    { "name": "Bathroom Cleaning", "icon": "cleaning_services" }
   ],
   "Help Moving": [
     { "name": "Packing", "icon": "handyman" },
     { "name": "Unpacking", "icon": "handyman" },
-    { "name": "Furniture Assembly", "icon": "handyman" }
+    { "name": "Furniture Assembly", "icon": "handyman" },
+    { "name": "Loading/Unloading", "icon": "handyman" },
+    { "name": "Heavy Lifting", "icon": "handyman" }
   ],
   "Painting": [
     { "name": "Wall Painting", "icon": "format_paint" },
-    { "name": "Furniture Painting", "icon": "format_paint" }
+    { "name": "Furniture Painting", "icon": "format_paint" },
+    { "name": "Exterior Painting", "icon": "format_paint" },
+    { "name": "Interior Painting", "icon": "format_paint" },
+    { "name": "Touch Up Work", "icon": "format_paint" }
   ],
   "Electrical Help": [
     { "name": "Wiring", "icon": "electrical_services" },
     { "name": "Lighting", "icon": "electrical_services" },
-    { "name": "Appliance Repair", "icon": "electrical_services" }
+    { "name": "Appliance Repair", "icon": "electrical_services" },
+    { "name": "Outlet Installation", "icon": "electrical_services" },
+    { "name": "Circuit Breaker", "icon": "electrical_services" }
+  ],
+  "AC Repair": [
+    { "name": "AC Installation", "icon": "ac_unit" },
+    { "name": "AC Repair", "icon": "ac_unit" },
+    { "name": "AC Maintenance", "icon": "ac_unit" },
+    { "name": "AC Cleaning", "icon": "ac_unit" },
+    { "name": "Duct Cleaning", "icon": "ac_unit" }
+  ],
+  "Cleaning": [
+    { "name": "House Cleaning", "icon": "cleaning_services" },
+    { "name": "Office Cleaning", "icon": "cleaning_services" },
+    { "name": "Post Construction", "icon": "cleaning_services" },
+    { "name": "Deep Cleaning", "icon": "cleaning_services" },
+    { "name": "Window Cleaning", "icon": "cleaning_services" }
+  ],
+  "Carpenter": [
+    { "name": "Furniture Repair", "icon": "handyman" },
+    { "name": "Cabinet Making", "icon": "handyman" },
+    { "name": "Door Installation", "icon": "handyman" },
+    { "name": "Shelf Installation", "icon": "handyman" },
+    { "name": "Wood Working", "icon": "handyman" }
+  ],
+  "Cooking": [
+    { "name": "Meal Prep", "icon": "restaurant" },
+    { "name": "Catering", "icon": "restaurant" },
+    { "name": "BBQ Services", "icon": "restaurant" },
+    { "name": "Baking", "icon": "restaurant" },
+    { "name": "Private Chef", "icon": "restaurant" }
+  ],
+  "Electrician": [
+    { "name": "Wiring", "icon": "electrical_services" },
+    { "name": "Lighting", "icon": "electrical_services" },
+    { "name": "Outlet Installation", "icon": "electrical_services" },
+    { "name": "Circuit Breaker", "icon": "electrical_services" },
+    { "name": "Electrical Inspection", "icon": "electrical_services" }
+  ],
+  "Painter": [
+    { "name": "Wall Painting", "icon": "format_paint" },
+    { "name": "Furniture Painting", "icon": "format_paint" },
+    { "name": "Exterior Painting", "icon": "format_paint" },
+    { "name": "Interior Painting", "icon": "format_paint" },
+    { "name": "Touch Up Work", "icon": "format_paint" }
+  ],
+  "Plumber": [
+    { "name": "Pipe Repair", "icon": "plumbing" },
+    { "name": "Leak Fixing", "icon": "plumbing" },
+    { "name": "Faucet Installation", "icon": "plumbing" },
+    { "name": "Toilet Repair", "icon": "plumbing" },
+    { "name": "Water Heater", "icon": "plumbing" }
+  ],
+  "Salon": [
+    { "name": "Hair Cut", "icon": "content_cut" },
+    { "name": "Hair Styling", "icon": "content_cut" },
+    { "name": "Hair Coloring", "icon": "content_cut" },
+    { "name": "Manicure", "icon": "content_cut" },
+    { "name": "Pedicure", "icon": "content_cut" }
   ]
 }
