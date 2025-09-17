@@ -11,6 +11,9 @@ import '../../features/booking/presentation/pages/bookings_page.dart';
 import '../../features/auth/presentation/pages/forgot_password_page.dart';
 import '../../features/auth/presentation/pages/reset_password_page.dart';
 import '../../features/auth/presentation/pages/verify_email_page.dart';
+import '../../features/location/presentation/pages/location_page.dart';
+import '../../features/location/presentation/pages/add_location_page.dart';
+import '../../features/location/presentation/pages/edit_location_page.dart';
 
 class AppRouter {
   // Development flag - set to true to bypass authentication for testing
@@ -72,6 +75,24 @@ class AppRouter {
         path: '/bookings',
         name: 'bookings',
         builder: (context, state) => const BookingsPage(),
+      ),
+      GoRoute(
+        path: '/location',
+        name: 'location',
+        builder: (context, state) => const LocationPage(),
+      ),
+      GoRoute(
+        path: '/add-location',
+        name: 'add-location',
+        builder: (context, state) => const AddLocationPage(),
+      ),
+      GoRoute(
+        path: '/edit-location',
+        name: 'edit-location',
+        builder: (context, state) {
+          final location = state.extra as dynamic;
+          return EditLocationPage(location: location);
+        },
       ),
       
       // Additional Routes

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 import 'package:service_booking/features/home/presentation/pages/categories_page.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -104,6 +105,12 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Image.asset('assets/images/logo.jpg', height: 28),
         ),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.location_on_outlined, color: Colors.black87),
+            onPressed: () {
+              context.push('/location');
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.chat_bubble_outline, color: Colors.black87),
             onPressed: () {},

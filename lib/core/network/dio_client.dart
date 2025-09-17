@@ -13,7 +13,7 @@ class DioClient {
   PersistCookieJar? _cookieJar;
 
   // Replace with a device-reachable URL (LAN/tunnel) when testing on a real device
-  static const String baseUrl = 'http://192.168.1.3:3000/api/auth';
+  static const String baseUrl = 'http://192.168.1.7:3000/api/auth';
 
   Future<Dio> get instance async {
     if (_dio != null) return _dio!;
