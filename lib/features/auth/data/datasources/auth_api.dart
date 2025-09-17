@@ -3,11 +3,10 @@ import '../../../../core/network/dio_client.dart';
 import '../models/user_model.dart';
 
 abstract class AuthApi {
-  Future<UserModel> login(String email, String password);
-  Future<UserModel> register(Map<String, dynamic> userData);
+  Future<Map<String, dynamic>> login(String email, String password, {bool rememberMe = false});
+  Future<Map<String, dynamic>> register(String name, String email, String password, {bool rememberMe = true});
   Future<void> logout();
-  Future<UserModel> getCurrentUser();
-  Future<void> refreshToken();
+  Future<Map<String, dynamic>?> getSession();
   Future<void> forgotPassword(String email);
   Future<void> resetPassword(String token, String newPassword);
   Future<void> verifyEmail(String token);
@@ -20,27 +19,18 @@ class AuthApiImpl implements AuthApi {
   AuthApiImpl(this._client);
 
   @override
-  Future<UserModel> login(String email, String password) async {
+  Future<Map<String, dynamic>> login(String email, String password, {bool rememberMe = false}) async {
     try {
       final dio = await _client.instance;
       final res = await dio.post('/sign-in/email', data: {
         'email': email,
         'password': password,
+        'callbackURL': '',
+        'rememberMe': rememberMe,
       });
 
       if (res.statusCode == 200 && res.data is Map<String, dynamic>) {
-        final data = res.data as Map<String, dynamic>;
-        final userData = data['user'] as Map<String, dynamic>;
-        return UserModel.fromJson({
-          'id': userData['id'],
-          'email': userData['email'],
-          'first_name': userData['name'] ?? '',
-          'last_name': '',
-          'created_at': userData['createdAt'],
-          'updated_at': userData['updatedAt'],
-          'is_email_verified': userData['emailVerified'] == true,
-          'is_active': true,
-        });
+        return res.data as Map<String, dynamic>;
       }
       throw Exception('Login failed (${res.statusCode})');
     } on DioException catch (e) {
@@ -49,30 +39,21 @@ class AuthApiImpl implements AuthApi {
   }
 
   @override
-  Future<UserModel> register(Map<String, dynamic> userData) async {
+  Future<Map<String, dynamic>> register(String name, String email, String password, {bool rememberMe = true}) async {
     try {
       final dio = await _client.instance;
       final payload = {
-        'name': (userData['first_name'] as String?) ?? (userData['name'] as String?),
-        'email': userData['email'],
-        'password': userData['password'],
-        'rememberMe': true,
+        'name': name,
+        'email': email,
+        'password': password,
+        'image': '',
+        'callbackURL': '',
+        'rememberMe': rememberMe,
       };
       final res = await dio.post('/sign-up/email', data: payload);
 
       if (res.statusCode == 200 && res.data is Map<String, dynamic>) {
-        final data = res.data as Map<String, dynamic>;
-        final u = data['user'] as Map<String, dynamic>;
-        return UserModel.fromJson({
-          'id': u['id'],
-          'email': u['email'],
-          'first_name': (payload['name'] as String?)?.split(' ').first ?? '',
-          'last_name': (payload['name'] as String?)?.split(' ').skip(1).join(' ') ?? '',
-          'created_at': u['createdAt'],
-          'updated_at': u['updatedAt'],
-          'is_email_verified': u['emailVerified'] == true,
-          'is_active': true,
-        });
+        return res.data as Map<String, dynamic>;
       }
       throw Exception('Registration failed (${res.statusCode})');
     } on DioException catch (e) {
@@ -91,15 +72,19 @@ class AuthApiImpl implements AuthApi {
   }
 
   @override
-  Future<UserModel> getCurrentUser() async {
-    // Better Auth OpenAPI excerpt provided does not include a /me endpoint.
-    // We rely on locally cached user for now.
-    throw Exception('getCurrentUser not supported by API spec');
-  }
+  Future<Map<String, dynamic>?> getSession() async {
+    try {
+      final dio = await _client.instance;
+      final res = await dio.get('/get-session');
 
-  @override
-  Future<void> refreshToken() async {
-    // Cookie-based sessions typically refresh server-side; no-op here.
+      if (res.statusCode == 200 && res.data is Map<String, dynamic>) {
+        return res.data as Map<String, dynamic>;
+      }
+      return null;
+    } on DioException catch (e) {
+      // Session not found or expired
+      return null;
+    }
   }
 
   @override

@@ -22,7 +22,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AuthRegisterRequested>(_onRegisterRequested);
     on<AuthLogoutRequested>(_onLogoutRequested);
     on<AuthCheckStatusRequested>(_onCheckStatusRequested);
-    on<AuthRefreshTokenRequested>(_onRefreshTokenRequested);
     on<AuthForgotPasswordRequested>(_onForgotPasswordRequested);
     on<AuthResetPasswordRequested>(_onResetPasswordRequested);
     on<AuthVerifyEmailRequested>(_onVerifyEmailRequested);
@@ -49,6 +48,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       final user = await _loginUser.call(LoginUserParams(
         email: event.email,
         password: event.password,
+        rememberMe: event.rememberMe,
       ));
       emit(AuthAuthenticated(user: user));
     } catch (e) {
@@ -63,10 +63,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(AuthLoading());
     try {
       final user = await _registerUser.call(RegisterUserParams(
-        name: event.firstName,
+        name: event.name,
         email: event.email,
         password: event.password,
-         // using full name from UI
+        rememberMe: event.rememberMe,
       ));
       emit(AuthAuthenticated(user: user));
     } catch (e) {
@@ -103,22 +103,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
-  Future<void> _onRefreshTokenRequested(
-    AuthRefreshTokenRequested event,
-    Emitter<AuthState> emit,
-  ) async {
-    try {
-      await _authRepository.refreshToken();
-      final user = await _authRepository.getCurrentUser();
-      if (user != null) {
-        emit(AuthAuthenticated(user: user));
-      } else {
-        emit(AuthUnauthenticated());
-      }
-    } catch (e) {
-      emit(AuthUnauthenticated());
-    }
-  }
 
   Future<void> _onForgotPasswordRequested(
     AuthForgotPasswordRequested event,

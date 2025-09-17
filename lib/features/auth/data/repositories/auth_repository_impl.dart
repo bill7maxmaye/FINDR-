@@ -12,9 +12,20 @@ class AuthRepositoryImpl implements AuthRepository {
   AuthRepositoryImpl(this._authApi, this._storageService);
 
   @override
-  Future<User> login(String email, String password) async {
+  Future<User> login(String email, String password, {bool rememberMe = false}) async {
     try {
-      final userModel = await _authApi.login(email, password);
+      final response = await _authApi.login(email, password, rememberMe: rememberMe);
+      final userData = response['user'] as Map<String, dynamic>;
+      final userModel = UserModel.fromJson({
+        'id': userData['id'],
+        'email': userData['email'],
+        'first_name': userData['name'] ?? '',
+        'last_name': '',
+        'created_at': userData['createdAt'],
+        'updated_at': userData['updatedAt'],
+        'is_email_verified': userData['emailVerified'] == true,
+        'is_active': true,
+      });
       final user = userModel.toEntity();
       
       // Save user profile locally. Session is cookie-based.
@@ -31,15 +42,21 @@ class AuthRepositoryImpl implements AuthRepository {
     required String email,
     required String password,
     required String name,
+    bool rememberMe = true,
   }) async {
     try {
-      final userData = {
-        'email': email,
-        'password': password,
-        'name': name,
-      };
-
-      final userModel = await _authApi.register(userData);
+      final response = await _authApi.register(name, email, password, rememberMe: rememberMe);
+      final userData = response['user'] as Map<String, dynamic>;
+      final userModel = UserModel.fromJson({
+        'id': userData['id'],
+        'email': userData['email'],
+        'first_name': userData['name'] ?? '',
+        'last_name': '',
+        'created_at': userData['createdAt'],
+        'updated_at': userData['updatedAt'],
+        'is_email_verified': userData['emailVerified'] == true,
+        'is_active': true,
+      });
       final user = userModel.toEntity();
       
       // Save user profile locally. Session is cookie-based.
@@ -73,14 +90,29 @@ class AuthRepositoryImpl implements AuthRepository {
         return UserModel.fromJson(userJson).toEntity();
       }
 
-      // If not in local storage, try to fetch from API
-      final userModel = await _authApi.getCurrentUser();
-      final user = userModel.toEntity();
+      // If not in local storage, try to fetch session from API
+      final sessionData = await _authApi.getSession();
+      if (sessionData != null && sessionData['user'] != null) {
+        final userData = sessionData['user'] as Map<String, dynamic>;
+        final userModel = UserModel.fromJson({
+          'id': userData['id'],
+          'email': userData['email'],
+          'first_name': userData['name'] ?? '',
+          'last_name': '',
+          'created_at': userData['createdAt'],
+          'updated_at': userData['updatedAt'],
+          'is_email_verified': userData['emailVerified'] == true,
+          'is_active': true,
+        });
+        final user = userModel.toEntity();
+        
+        // Save to local storage for future use
+        await _storageService.setJson(AppConstants.userKey, userModel.toJson());
+        
+        return user;
+      }
       
-      // Save to local storage for future use
-      await _storageService.setJson(AppConstants.userKey, userModel.toJson());
-      
-      return user;
+      return null;
     } catch (e) {
       return null;
     }
@@ -103,26 +135,6 @@ class AuthRepositoryImpl implements AuthRepository {
     return user != null;
   }
 
-  @override
-  Future<String?> getAuthToken() async {
-    // Cookie-based session; no bearer token stored.
-    return null;
-  }
-
-  @override
-  Future<void> saveAuthToken(String token) async {
-    // Cookie-based session; ignore.
-  }
-
-  @override
-  Future<void> clearAuthToken() async {
-    // Cookie-based session; ignore.
-  }
-
-  @override
-  Future<void> refreshToken() async {
-    // Cookie-based session; no explicit client refresh needed.
-  }
 
   @override
   Future<void> forgotPassword(String email) async {

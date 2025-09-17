@@ -174,9 +174,8 @@ class _RegisterPageState extends State<RegisterPage> {
             AuthRegisterRequested(
               email: _emailController.text.trim(),
               password: _passwordController.text,
-              firstName: _nameController.text.trim(), // temporarily mapped; use usecase param name
-              lastName: '',
-              phoneNumber: null,
+              name: _nameController.text.trim(),
+              rememberMe: _rememberMe,
             ),
           );
     }

@@ -14,17 +14,19 @@ class LoginUser {
       throw Exception('Password is required');
     }
 
-    return await repository.login(params.email, params.password);
+    return await repository.login(params.email, params.password, rememberMe: params.rememberMe);
   }
 }
 
 class LoginUserParams {
   final String email;
   final String password;
+  final bool rememberMe;
 
   LoginUserParams({
     required this.email,
     required this.password,
+    this.rememberMe = false,
   });
 }
 

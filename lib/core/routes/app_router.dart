@@ -17,7 +17,7 @@ import '../../features/location/presentation/pages/edit_location_page.dart';
 
 class AppRouter {
   // Development flag - set to true to bypass authentication for testing
-  static const bool _isDevelopment = true;
+  static const bool _isDevelopment = false;
   
   static final GoRouter _router = GoRouter(
     initialLocation: '/home',

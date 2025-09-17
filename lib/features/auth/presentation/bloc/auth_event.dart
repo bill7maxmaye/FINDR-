@@ -3,26 +3,26 @@ abstract class AuthEvent {}
 class AuthLoginRequested extends AuthEvent {
   final String email;
   final String password;
+  final bool rememberMe;
 
   AuthLoginRequested({
     required this.email,
     required this.password,
+    this.rememberMe = false,
   });
 }
 
 class AuthRegisterRequested extends AuthEvent {
   final String email;
   final String password;
-  final String firstName;
-  final String lastName;
-  final String? phoneNumber;
+  final String name;
+  final bool rememberMe;
 
   AuthRegisterRequested({
     required this.email,
     required this.password,
-    required this.firstName,
-    required this.lastName,
-    this.phoneNumber,
+    required this.name,
+    this.rememberMe = true,
   });
 }
 
@@ -30,7 +30,6 @@ class AuthLogoutRequested extends AuthEvent {}
 
 class AuthCheckStatusRequested extends AuthEvent {}
 
-class AuthRefreshTokenRequested extends AuthEvent {}
 
 class AuthForgotPasswordRequested extends AuthEvent {
   final String email;

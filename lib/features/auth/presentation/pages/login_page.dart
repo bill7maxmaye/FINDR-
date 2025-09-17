@@ -146,6 +146,7 @@ class _LoginPageState extends State<LoginPage> {
             AuthLoginRequested(
               email: _emailController.text.trim(),
               password: _passwordController.text,
+              rememberMe: _rememberMe,
             ),
           );
     }
