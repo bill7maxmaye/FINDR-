@@ -1,11 +1,11 @@
 import '../repositories/location_repository.dart';
 
 class DeleteLocation {
-  final LocationRepository _repository;
+  final LocationRepository _locationRepository;
 
-  DeleteLocation(this._repository);
+  DeleteLocation(this._locationRepository);
 
   Future<void> call(String locationId) async {
-    await _repository.deleteLocation(locationId);
+    return await _locationRepository.deleteLocation(locationId);
   }
 }

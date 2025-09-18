@@ -1,20 +1,44 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../data/services/location_service.dart';
+import '../../data/datasources/location_api.dart';
+import '../../data/repositories/location_repository_impl.dart';
+import '../../domain/repositories/location_repository.dart';
+import '../../domain/usecases/get_all_locations.dart';
+import '../../domain/usecases/add_location.dart';
+import '../../domain/usecases/update_location.dart';
+import '../../domain/usecases/delete_location.dart';
+import '../../domain/usecases/get_location_by_id.dart';
+import '../../domain/usecases/change_primary_location.dart';
+import '../../../../core/network/dio_client.dart';
 import 'location_event.dart';
 import 'location_state.dart';
 
 class LocationBloc extends Bloc<LocationEvent, LocationState> {
-  final LocationService _locationService;
+  late final GetAllLocations _getAllLocations;
+  late final AddLocation _addLocation;
+  late final UpdateLocation _updateLocation;
+  late final DeleteLocation _deleteLocation;
+  late final ChangePrimaryLocation _changePrimaryLocation;
+  late final LocationRepository _locationRepository;
 
-  LocationBloc({required LocationService locationService})
-      : _locationService = locationService,
-        super(const LocationInitial()) {
+  LocationBloc() : super(const LocationInitial()) {
+    _initializeDependencies();
     on<LoadLocations>(_onLoadLocations);
-    on<AddLocation>(_onAddLocation);
-    on<UpdateLocation>(_onUpdateLocation);
-    on<DeleteLocation>(_onDeleteLocation);
+    on<AddLocationEvent>(_onAddLocation);
+    on<UpdateLocationEvent>(_onUpdateLocation);
+    on<DeleteLocationEvent>(_onDeleteLocation);
     on<SetPrimaryLocation>(_onSetPrimaryLocation);
     on<ClearError>(_onClearError);
+  }
+
+  void _initializeDependencies() {
+    final dioClient = DioClient();
+    final locationApi = LocationApiImpl(dioClient);
+    _locationRepository = LocationRepositoryImpl(locationApi);
+    _getAllLocations = GetAllLocations(_locationRepository);
+    _addLocation = AddLocation(_locationRepository);
+    _updateLocation = UpdateLocation(_locationRepository);
+    _deleteLocation = DeleteLocation(_locationRepository);
+    _changePrimaryLocation = ChangePrimaryLocation(_locationRepository);
   }
 
   Future<void> _onLoadLocations(
@@ -23,7 +47,7 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
   ) async {
     try {
       emit(const LocationLoading());
-      final locations = await _locationService.getAllLocations();
+      final locations = await _getAllLocations.call();
       
       if (locations.isEmpty) {
         emit(const LocationEmpty());
@@ -36,22 +60,22 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
   }
 
   Future<void> _onAddLocation(
-    AddLocation event,
+    AddLocationEvent event,
     Emitter<LocationState> emit,
   ) async {
     try {
       emit(const LocationLoading());
       
-      await _locationService.addLocation(
+      await _addLocation.call(AddLocationParams(
         subCity: event.subCity,
         worada: event.worada,
         name: event.name,
         longitude: event.longitude,
         latitude: event.latitude,
         isPrimary: event.isPrimary,
-      );
+      ));
       
-      final locations = await _locationService.getAllLocations();
+      final locations = await _getAllLocations.call();
       emit(LocationSuccess(
         message: 'Location added successfully',
         locations: locations,
@@ -66,13 +90,13 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
   }
 
   Future<void> _onUpdateLocation(
-    UpdateLocation event,
+    UpdateLocationEvent event,
     Emitter<LocationState> emit,
   ) async {
     try {
       emit(const LocationLoading());
       
-      await _locationService.updateLocation(
+      await _updateLocation.call(UpdateLocationParams(
         id: event.id,
         subCity: event.subCity,
         worada: event.worada,
@@ -80,9 +104,9 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
         longitude: event.longitude,
         latitude: event.latitude,
         isPrimary: event.isPrimary,
-      );
+      ));
       
-      final locations = await _locationService.getAllLocations();
+      final locations = await _getAllLocations.call();
       emit(LocationSuccess(
         message: 'Location updated successfully',
         locations: locations,
@@ -97,15 +121,15 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
   }
 
   Future<void> _onDeleteLocation(
-    DeleteLocation event,
+    DeleteLocationEvent event,
     Emitter<LocationState> emit,
   ) async {
     try {
       emit(const LocationLoading());
       
-      await _locationService.deleteLocation(event.locationId);
+      await _deleteLocation.call(event.locationId);
       
-      final locations = await _locationService.getAllLocations();
+      final locations = await _getAllLocations.call();
       
       if (locations.isEmpty) {
         emit(const LocationEmpty());
@@ -131,9 +155,9 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
     try {
       emit(const LocationLoading());
       
-      await _locationService.setPrimaryLocation(event.locationId);
+      await _changePrimaryLocation.call(event.locationId);
       
-      final locations = await _locationService.getAllLocations();
+      final locations = await _getAllLocations.call();
       emit(LocationSuccess(
         message: 'Primary location updated successfully',
         locations: locations,

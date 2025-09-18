@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import '../bloc/location_bloc.dart';
 import '../bloc/location_event.dart';
 import '../bloc/location_state.dart';
-import '../../data/services/location_service.dart';
 
 class AddLocationPage extends StatelessWidget {
   const AddLocationPage({Key? key}) : super(key: key);
@@ -43,7 +42,7 @@ class _AddLocationPageViewState extends State<_AddLocationPageView> {
 
   void _saveLocation() {
     if (_formKey.currentState!.validate()) {
-      context.read<LocationBloc>().add(AddLocation(
+      context.read<LocationBloc>().add(AddLocationEvent(
         subCity: _subCityController.text,
         worada: _woradaController.text,
         name: _nameController.text,

@@ -11,7 +11,7 @@ class LoadLocations extends LocationEvent {
   const LoadLocations();
 }
 
-class AddLocation extends LocationEvent {
+class AddLocationEvent extends LocationEvent {
   final String subCity;
   final String worada;
   final String name;
@@ -19,7 +19,7 @@ class AddLocation extends LocationEvent {
   final double latitude;
   final bool isPrimary;
 
-  const AddLocation({
+  const AddLocationEvent({
     required this.subCity,
     required this.worada,
     required this.name,
@@ -32,7 +32,7 @@ class AddLocation extends LocationEvent {
   List<Object?> get props => [subCity, worada, name, longitude, latitude, isPrimary];
 }
 
-class UpdateLocation extends LocationEvent {
+class UpdateLocationEvent extends LocationEvent {
   final String id;
   final String? subCity;
   final String? worada;
@@ -41,7 +41,7 @@ class UpdateLocation extends LocationEvent {
   final double? latitude;
   final bool? isPrimary;
 
-  const UpdateLocation({
+  const UpdateLocationEvent({
     required this.id,
     this.subCity,
     this.worada,
@@ -55,10 +55,10 @@ class UpdateLocation extends LocationEvent {
   List<Object?> get props => [id, subCity, worada, name, longitude, latitude, isPrimary];
 }
 
-class DeleteLocation extends LocationEvent {
+class DeleteLocationEvent extends LocationEvent {
   final String locationId;
 
-  const DeleteLocation(this.locationId);
+  const DeleteLocationEvent(this.locationId);
 
   @override
   List<Object?> get props => [locationId];

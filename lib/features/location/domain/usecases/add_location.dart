@@ -2,25 +2,36 @@ import '../entities/location_entity.dart';
 import '../repositories/location_repository.dart';
 
 class AddLocation {
-  final LocationRepository _repository;
+  final LocationRepository _locationRepository;
 
-  AddLocation(this._repository);
+  AddLocation(this._locationRepository);
 
-  Future<LocationEntity> call({
-    required String subCity,
-    required String worada,
-    required String name,
-    required double longitude,
-    required double latitude,
-    bool isPrimary = false,
-  }) async {
-    return await _repository.addLocation(
-      subCity: subCity,
-      worada: worada,
-      name: name,
-      longitude: longitude,
-      latitude: latitude,
-      isPrimary: isPrimary,
+  Future<LocationEntity> call(AddLocationParams params) async {
+    return await _locationRepository.addLocation(
+      subCity: params.subCity,
+      worada: params.worada,
+      name: params.name,
+      longitude: params.longitude,
+      latitude: params.latitude,
+      isPrimary: params.isPrimary,
     );
   }
+}
+
+class AddLocationParams {
+  final String subCity;
+  final String worada;
+  final String name;
+  final double longitude;
+  final double latitude;
+  final bool isPrimary;
+
+  AddLocationParams({
+    required this.subCity,
+    required this.worada,
+    required this.name,
+    required this.longitude,
+    required this.latitude,
+    this.isPrimary = false,
+  });
 }

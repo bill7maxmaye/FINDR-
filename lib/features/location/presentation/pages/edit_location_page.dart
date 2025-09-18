@@ -5,7 +5,6 @@ import '../bloc/location_bloc.dart';
 import '../bloc/location_event.dart';
 import '../bloc/location_state.dart';
 import '../../domain/entities/location_entity.dart';
-import '../../data/services/location_service.dart';
 
 class EditLocationPage extends StatelessWidget {
   final LocationEntity location;
@@ -62,7 +61,7 @@ class _EditLocationPageViewState extends State<_EditLocationPageView> {
 
   void _updateLocation() {
     if (_formKey.currentState!.validate()) {
-      context.read<LocationBloc>().add(UpdateLocation(
+      context.read<LocationBloc>().add(UpdateLocationEvent(
         id: widget.location.id,
         subCity: _subCityController.text,
         worada: _woradaController.text,

@@ -23,4 +23,3 @@ abstract class LocationRepository {
   Future<LocationEntity?> getLocationById(String locationId);
   Future<LocationEntity> changePrimaryLocation(String locationId);
 }
-

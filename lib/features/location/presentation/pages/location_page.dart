@@ -7,7 +7,6 @@ import '../bloc/location_bloc.dart';
 import '../bloc/location_event.dart';
 import '../bloc/location_state.dart';
 import '../../domain/entities/location_entity.dart';
-import '../../data/services/location_service.dart';
 
 class LocationPage extends StatelessWidget {
   const LocationPage({Key? key}) : super(key: key);
@@ -55,7 +54,7 @@ class _LocationPageViewState extends State<_LocationPageView> {
 
       // Get current location and add it
       final position = await Geolocator.getCurrentPosition();
-      context.read<LocationBloc>().add(AddLocation(
+      context.read<LocationBloc>().add(AddLocationEvent(
         subCity: 'Current Location',
         worada: 'Current Location',
         name: 'My Current Location',
@@ -127,7 +126,7 @@ class _LocationPageViewState extends State<_LocationPageView> {
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              context.read<LocationBloc>().add(DeleteLocation(location.id));
+              context.read<LocationBloc>().add(DeleteLocationEvent(location.id));
             },
             child: const Text('Delete', style: TextStyle(color: Colors.red)),
           ),
