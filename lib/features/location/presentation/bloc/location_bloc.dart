@@ -1,30 +1,29 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../domain/repositories/location_repository.dart';
+import '../../data/services/location_service.dart';
 import 'location_event.dart';
 import 'location_state.dart';
 
 class LocationBloc extends Bloc<LocationEvent, LocationState> {
-  final LocationRepository _locationRepository;
+  final LocationService _locationService;
 
-  LocationBloc({required LocationRepository locationRepository})
-      : _locationRepository = locationRepository,
+  LocationBloc({required LocationService locationService})
+      : _locationService = locationService,
         super(const LocationInitial()) {
-    on<LoadAllLocations>(_onLoadAllLocations);
+    on<LoadLocations>(_onLoadLocations);
     on<AddLocation>(_onAddLocation);
     on<UpdateLocation>(_onUpdateLocation);
     on<DeleteLocation>(_onDeleteLocation);
-    on<ChangePrimaryLocation>(_onChangePrimaryLocation);
-    on<GetLocationById>(_onGetLocationById);
-    on<ClearLocationError>(_onClearLocationError);
+    on<SetPrimaryLocation>(_onSetPrimaryLocation);
+    on<ClearError>(_onClearError);
   }
 
-  Future<void> _onLoadAllLocations(
-    LoadAllLocations event,
+  Future<void> _onLoadLocations(
+    LoadLocations event,
     Emitter<LocationState> emit,
   ) async {
     try {
       emit(const LocationLoading());
-      final locations = await _locationRepository.getAllLocations();
+      final locations = await _locationService.getAllLocations();
       
       if (locations.isEmpty) {
         emit(const LocationEmpty());
@@ -42,7 +41,8 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
   ) async {
     try {
       emit(const LocationLoading());
-      await _locationRepository.addLocation(
+      
+      await _locationService.addLocation(
         subCity: event.subCity,
         worada: event.worada,
         name: event.name,
@@ -50,12 +50,16 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
         latitude: event.latitude,
         isPrimary: event.isPrimary,
       );
-      final locations = await _locationRepository.getAllLocations();
       
-      emit(LocationOperationSuccess(
+      final locations = await _locationService.getAllLocations();
+      emit(LocationSuccess(
         message: 'Location added successfully',
         locations: locations,
       ));
+      
+      // After a brief moment, emit the loaded state to ensure UI updates
+      await Future.delayed(const Duration(milliseconds: 100));
+      emit(LocationLoaded(locations: locations));
     } catch (e) {
       emit(LocationError('Failed to add location: $e'));
     }
@@ -67,7 +71,8 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
   ) async {
     try {
       emit(const LocationLoading());
-      await _locationRepository.updateLocation(
+      
+      await _locationService.updateLocation(
         id: event.id,
         subCity: event.subCity,
         worada: event.worada,
@@ -76,12 +81,16 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
         latitude: event.latitude,
         isPrimary: event.isPrimary,
       );
-      final locations = await _locationRepository.getAllLocations();
       
-      emit(LocationOperationSuccess(
+      final locations = await _locationService.getAllLocations();
+      emit(LocationSuccess(
         message: 'Location updated successfully',
         locations: locations,
       ));
+      
+      // After a brief moment, emit the loaded state to ensure UI updates
+      await Future.delayed(const Duration(milliseconds: 100));
+      emit(LocationLoaded(locations: locations));
     } catch (e) {
       emit(LocationError('Failed to update location: $e'));
     }
@@ -93,63 +102,55 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
   ) async {
     try {
       emit(const LocationLoading());
-      await _locationRepository.deleteLocation(event.locationId);
-      final locations = await _locationRepository.getAllLocations();
+      
+      await _locationService.deleteLocation(event.locationId);
+      
+      final locations = await _locationService.getAllLocations();
       
       if (locations.isEmpty) {
         emit(const LocationEmpty());
       } else {
-        emit(LocationOperationSuccess(
+        emit(LocationSuccess(
           message: 'Location deleted successfully',
           locations: locations,
         ));
+        
+        // After a brief moment, emit the loaded state to ensure UI updates
+        await Future.delayed(const Duration(milliseconds: 100));
+        emit(LocationLoaded(locations: locations));
       }
     } catch (e) {
       emit(LocationError('Failed to delete location: $e'));
     }
   }
 
-  Future<void> _onChangePrimaryLocation(
-    ChangePrimaryLocation event,
+  Future<void> _onSetPrimaryLocation(
+    SetPrimaryLocation event,
     Emitter<LocationState> emit,
   ) async {
     try {
       emit(const LocationLoading());
-      await _locationRepository.changePrimaryLocation(event.locationId);
-      final locations = await _locationRepository.getAllLocations();
       
-      emit(LocationOperationSuccess(
-        message: 'Primary location changed successfully',
+      await _locationService.setPrimaryLocation(event.locationId);
+      
+      final locations = await _locationService.getAllLocations();
+      emit(LocationSuccess(
+        message: 'Primary location updated successfully',
         locations: locations,
       ));
-    } catch (e) {
-      emit(LocationError('Failed to change primary location: $e'));
-    }
-  }
-
-  Future<void> _onGetLocationById(
-    GetLocationById event,
-    Emitter<LocationState> emit,
-  ) async {
-    try {
-      emit(const LocationLoading());
-      final location = await _locationRepository.getLocationById(event.locationId);
       
-      if (location != null) {
-        emit(LocationDetailLoaded(location));
-      } else {
-        emit(const LocationError('Location not found'));
-      }
+      // After a brief moment, emit the loaded state to ensure UI updates
+      await Future.delayed(const Duration(milliseconds: 100));
+      emit(LocationLoaded(locations: locations));
     } catch (e) {
-      emit(LocationError('Failed to get location: $e'));
+      emit(LocationError('Failed to set primary location: $e'));
     }
   }
 
-  Future<void> _onClearLocationError(
-    ClearLocationError event,
+  Future<void> _onClearError(
+    ClearError event,
     Emitter<LocationState> emit,
   ) async {
-    // Reload locations to get back to normal state
-    add(const LoadAllLocations());
+    add(const LoadLocations());
   }
 }

@@ -7,8 +7,8 @@ abstract class LocationEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-class LoadAllLocations extends LocationEvent {
-  const LoadAllLocations();
+class LoadLocations extends LocationEvent {
+  const LoadLocations();
 }
 
 class AddLocation extends LocationEvent {
@@ -64,25 +64,15 @@ class DeleteLocation extends LocationEvent {
   List<Object?> get props => [locationId];
 }
 
-class ChangePrimaryLocation extends LocationEvent {
+class SetPrimaryLocation extends LocationEvent {
   final String locationId;
 
-  const ChangePrimaryLocation(this.locationId);
+  const SetPrimaryLocation(this.locationId);
 
   @override
   List<Object?> get props => [locationId];
 }
 
-class GetLocationById extends LocationEvent {
-  final String locationId;
-
-  const GetLocationById(this.locationId);
-
-  @override
-  List<Object?> get props => [locationId];
+class ClearError extends LocationEvent {
+  const ClearError();
 }
-
-class ClearLocationError extends LocationEvent {
-  const ClearLocationError();
-}
-

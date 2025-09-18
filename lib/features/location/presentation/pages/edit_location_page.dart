@@ -1,30 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../bloc/location_bloc.dart';
 import '../bloc/location_event.dart';
 import '../bloc/location_state.dart';
 import '../../domain/entities/location_entity.dart';
-import '../../data/repositories/location_repository_impl.dart';
-import '../../data/datasources/location_api.dart';
-import '../../../../core/network/dio_client.dart';
+import '../../data/services/location_service.dart';
 
 class EditLocationPage extends StatelessWidget {
   final LocationEntity location;
 
-  const EditLocationPage({Key? key, required this.location}) : super(key: key);
+  const EditLocationPage({
+    Key? key,
+    required this.location,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => LocationBloc(
-        locationRepository: LocationRepositoryImpl(
-          LocationApiImpl(DioClient()),
-        ),
-      ),
-      child: _EditLocationPageView(location: location),
-    );
+    return _EditLocationPageView(location: location);
   }
 }
 
@@ -39,26 +32,21 @@ class _EditLocationPageView extends StatefulWidget {
 
 class _EditLocationPageViewState extends State<_EditLocationPageView> {
   final _formKey = GlobalKey<FormState>();
-  final _subCityController = TextEditingController();
-  final _woradaController = TextEditingController();
-  final _nameController = TextEditingController();
-  final _longitudeController = TextEditingController();
-  final _latitudeController = TextEditingController();
-
-  bool _isPrimaryLocation = false;
+  late final TextEditingController _subCityController;
+  late final TextEditingController _woradaController;
+  late final TextEditingController _nameController;
+  late final TextEditingController _longitudeController;
+  late final TextEditingController _latitudeController;
+  late bool _isPrimaryLocation;
 
   @override
   void initState() {
     super.initState();
-    _initializeForm();
-  }
-
-  void _initializeForm() {
-    _nameController.text = widget.location.name;
-    _subCityController.text = widget.location.subCity;
-    _woradaController.text = widget.location.worada;
-    _longitudeController.text = widget.location.longitude.toString();
-    _latitudeController.text = widget.location.latitude.toString();
+    _subCityController = TextEditingController(text: widget.location.subCity);
+    _woradaController = TextEditingController(text: widget.location.worada);
+    _nameController = TextEditingController(text: widget.location.name);
+    _longitudeController = TextEditingController(text: widget.location.longitude.toString());
+    _latitudeController = TextEditingController(text: widget.location.latitude.toString());
     _isPrimaryLocation = widget.location.isPrimary;
   }
 
@@ -86,203 +74,193 @@ class _EditLocationPageViewState extends State<_EditLocationPageView> {
     }
   }
 
-  void _deleteLocation() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Delete Location'),
-        content: Text('Are you sure you want to delete ${widget.location.name}?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              context.read<LocationBloc>().add(DeleteLocation(widget.location.id));
-            },
-            child: const Text('Delete', style: TextStyle(color: Colors.red)),
-          ),
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    return BlocListener<LocationBloc, LocationState>(
-      listener: (context, state) {
-        if (state is LocationOperationSuccess) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.message),
-              backgroundColor: Colors.green,
-            ),
-          );
-          context.pop();
-        } else if (state is LocationError) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.message),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
-      },
-      child: Scaffold(
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
         backgroundColor: Colors.white,
-        appBar: AppBar(
-          backgroundColor: Colors.white,
-          elevation: 0,
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.black),
-            onPressed: () => context.pop(),
-          ),
-          title: const Text(
-            'Edit location',
-            style: TextStyle(
-              color: Colors.black,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          centerTitle: true,
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.delete_outline, color: Colors.red),
-              onPressed: _deleteLocation,
-            ),
-          ],
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => context.pop(),
         ),
-        body: BlocBuilder<LocationBloc, LocationState>(
-          builder: (context, state) {
-            return Form(
-              key: _formKey,
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(20.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+        title: const Text(
+          'Edit Location',
+          style: TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        centerTitle: true,
+      ),
+      body: BlocListener<LocationBloc, LocationState>(
+        listener: (context, state) {
+          if (state is LocationSuccess) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.message),
+                backgroundColor: Colors.green,
+              ),
+            );
+            context.pop();
+          } else if (state is LocationError) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.message),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+        },
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(20.0),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Edit Location Details',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                
+                // Sub City Field
+                TextFormField(
+                  controller: _subCityController,
+                  decoration: InputDecoration(
+                    labelText: 'Sub City',
+                    hintText: 'Enter sub city',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    prefixIcon: const Icon(Icons.location_city),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter sub city';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+                
+                // Worada Field
+                TextFormField(
+                  controller: _woradaController,
+                  decoration: InputDecoration(
+                    labelText: 'Worada',
+                    hintText: 'Enter worada',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    prefixIcon: const Icon(Icons.location_on),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter worada';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+                
+                // Name Field
+                TextFormField(
+                  controller: _nameController,
+                  decoration: InputDecoration(
+                    labelText: 'Location Name',
+                    hintText: 'Enter location name',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    prefixIcon: const Icon(Icons.place),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter location name';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+                
+                // Coordinates Row
+                Row(
                   children: [
-                    // Location Name Field
-                    _buildInputField(
-                      controller: _nameController,
-                      label: 'Location Name',
-                      icon: Icons.location_on_outlined,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter location name';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 16),
-
-                    // Sub City Field
-                    _buildInputField(
-                      controller: _subCityController,
-                      label: 'Sub City',
-                      icon: Icons.location_city,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter sub city';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 16),
-
-                    // Worada Field
-                    _buildInputField(
-                      controller: _woradaController,
-                      label: 'Worada',
-                      icon: Icons.location_city,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter worada';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 16),
-
-                    // Coordinates Section
-                    const Text(
-                      'Coordinates',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black87,
+                    Expanded(
+                      child: TextFormField(
+                        controller: _latitudeController,
+                        decoration: InputDecoration(
+                          labelText: 'Latitude',
+                          hintText: '0.000000',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          prefixIcon: const Icon(Icons.my_location),
+                        ),
+                        keyboardType: TextInputType.numberWithOptions(decimal: true),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Required';
+                          }
+                          if (double.tryParse(value) == null) {
+                            return 'Invalid number';
+                          }
+                          return null;
+                        },
                       ),
                     ),
-                    const SizedBox(height: 12),
-
-                    // Longitude and Latitude Fields
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _buildInputField(
-                            controller: _longitudeController,
-                            label: 'Longitude',
-                            icon: Icons.map,
-                            keyboardType: TextInputType.numberWithOptions(decimal: true),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Required';
-                              }
-                              if (double.tryParse(value) == null) {
-                                return 'Invalid number';
-                              }
-                              return null;
-                            },
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: TextFormField(
+                        controller: _longitudeController,
+                        decoration: InputDecoration(
+                          labelText: 'Longitude',
+                          hintText: '0.000000',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
                           ),
+                          prefixIcon: const Icon(Icons.my_location),
                         ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: _buildInputField(
-                            controller: _latitudeController,
-                            label: 'Latitude',
-                            icon: Icons.map,
-                            keyboardType: TextInputType.numberWithOptions(decimal: true),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Required';
-                              }
-                              if (double.tryParse(value) == null) {
-                                return 'Invalid number';
-                              }
-                              return null;
-                            },
-                          ),
-                        ),
-                      ],
+                        keyboardType: TextInputType.numberWithOptions(decimal: true),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Required';
+                          }
+                          if (double.tryParse(value) == null) {
+                            return 'Invalid number';
+                          }
+                          return null;
+                        },
+                      ),
                     ),
-                    const SizedBox(height: 20),
-
-                    // Primary Location Checkbox
-                    Row(
-                      children: [
-                        Checkbox(
-                          value: _isPrimaryLocation,
-                          onChanged: (value) {
-                            setState(() {
-                              _isPrimaryLocation = value ?? false;
-                            });
-                          },
-                          activeColor: Colors.blue,
-                        ),
-                        const Text(
-                          'Set as primary location',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 32),
-
-                    // Update Location Button
-                    SizedBox(
+                  ],
+                ),
+                const SizedBox(height: 20),
+                
+                // Primary Location Checkbox
+                CheckboxListTile(
+                  title: const Text('Set as primary location'),
+                  subtitle: const Text('This will be your default location'),
+                  value: _isPrimaryLocation,
+                  onChanged: (value) {
+                    setState(() {
+                      _isPrimaryLocation = value ?? false;
+                    });
+                  },
+                  controlAffinity: ListTileControlAffinity.leading,
+                ),
+                const SizedBox(height: 30),
+                
+                // Update Button
+                BlocBuilder<LocationBloc, LocationState>(
+                  builder: (context, state) {
+                    return SizedBox(
                       width: double.infinity,
                       height: 56,
                       child: ElevatedButton(
@@ -296,62 +274,24 @@ class _EditLocationPageViewState extends State<_EditLocationPageView> {
                           elevation: 0,
                         ),
                         child: state is LocationLoading
-                            ? const SizedBox(
-                                width: 20,
-                                height: 20,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                                ),
+                            ? const CircularProgressIndicator(
+                                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                               )
                             : const Text(
-                                'Update location',
+                                'Update Location',
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
                       ),
-                    ),
-                  ],
+                    );
+                  },
                 ),
-              ),
-            );
-          },
+              ],
+            ),
+          ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildInputField({
-    required TextEditingController controller,
-    required String label,
-    required IconData icon,
-    String? Function(String?)? validator,
-    TextInputType? keyboardType,
-  }) {
-    return TextFormField(
-      controller: controller,
-      validator: validator,
-      keyboardType: keyboardType,
-      decoration: InputDecoration(
-        labelText: label,
-        prefixIcon: Icon(icon, color: Colors.grey[600]),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: Colors.grey[300]!),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: Colors.grey[300]!),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Colors.blue, width: 2),
-        ),
-        filled: true,
-        fillColor: Colors.grey[50],
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       ),
     );
   }

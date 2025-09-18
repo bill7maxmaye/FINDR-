@@ -59,5 +59,33 @@ class LocationEntity extends Equatable {
       updatedAt: updatedAt ?? this.updatedAt,
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'subCity': subCity,
+      'worada': worada,
+      'name': name,
+      'longitude': longitude,
+      'latitude': latitude,
+      'isPrimary': isPrimary,
+      'createdAt': createdAt.toIso8601String(),
+      'updatedAt': updatedAt.toIso8601String(),
+    };
+  }
+
+  factory LocationEntity.fromJson(Map<String, dynamic> json) {
+    return LocationEntity(
+      id: json['id'] as String,
+      subCity: json['subCity'] as String,
+      worada: json['worada'] as String,
+      name: json['name'] as String,
+      longitude: (json['longitude'] as num).toDouble(),
+      latitude: (json['latitude'] as num).toDouble(),
+      isPrimary: json['isPrimary'] as bool,
+      createdAt: DateTime.parse(json['createdAt'] as String),
+      updatedAt: DateTime.parse(json['updatedAt'] as String),
+    );
+  }
 }
 

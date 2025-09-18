@@ -7,23 +7,14 @@ import '../bloc/location_bloc.dart';
 import '../bloc/location_event.dart';
 import '../bloc/location_state.dart';
 import '../../domain/entities/location_entity.dart';
-import '../../data/repositories/location_repository_impl.dart';
-import '../../data/datasources/location_api.dart';
-import '../../../../core/network/dio_client.dart';
+import '../../data/services/location_service.dart';
 
 class LocationPage extends StatelessWidget {
   const LocationPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-      return BlocProvider(
-        create: (context) => LocationBloc(
-          locationRepository: LocationRepositoryImpl(
-            LocationApiImpl(DioClient()),
-          ),
-        )..add(const LoadAllLocations()),
-        child: const _LocationPageView(),
-      );
+    return const _LocationPageView();
   }
 }
 
@@ -38,7 +29,6 @@ class _LocationPageViewState extends State<_LocationPageView> {
   bool _isLoading = false;
 
   Future<void> _addNewLocation() async {
-    // Navigate to add location page
     context.push('/add-location');
   }
 
@@ -82,90 +72,6 @@ class _LocationPageViewState extends State<_LocationPageView> {
     }
   }
 
-  void _showLocationPicker() {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) => DraggableScrollableSheet(
-        initialChildSize: 0.6,
-        minChildSize: 0.3,
-        maxChildSize: 0.9,
-        builder: (context, scrollController) => Container(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[300],
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-              const Text(
-                'Add New Location',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 20),
-              TextField(
-                decoration: InputDecoration(
-                  hintText: 'Search for a location...',
-                  prefixIcon: const Icon(Icons.search),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-              const Text(
-                'Recent Locations',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(height: 10),
-              Expanded(
-                child: ListView(
-                  children: [
-                    ListTile(
-                      leading: const Icon(Icons.home),
-                      title: const Text('Home'),
-                      subtitle: const Text('123 Main Street, City'),
-                      onTap: () {
-                        Navigator.pop(context);
-                        // TODO: Add this location
-                      },
-                    ),
-                    ListTile(
-                      leading: const Icon(Icons.work),
-                      title: const Text('Office'),
-                      subtitle: const Text('456 Business Ave, City'),
-                      onTap: () {
-                        Navigator.pop(context);
-                        // TODO: Add this location
-                      },
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
   void _showPermissionDeniedDialog() {
     showDialog(
       context: context,
@@ -185,24 +91,6 @@ class _LocationPageViewState extends State<_LocationPageView> {
               openAppSettings();
             },
             child: const Text('Open Settings'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showLocationAddedDialog(Position position) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Location Added'),
-        content: Text(
-          'Current location added successfully!\n\nLat: ${position.latitude.toStringAsFixed(6)}\nLng: ${position.longitude.toStringAsFixed(6)}',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('OK'),
           ),
         ],
       ),
@@ -257,7 +145,13 @@ class _LocationPageViewState extends State<_LocationPageView> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => context.pop(),
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go('/home');
+            }
+          },
         ),
         title: const Text(
           'Location',
@@ -272,7 +166,7 @@ class _LocationPageViewState extends State<_LocationPageView> {
         listener: (context, state) {
           if (state is LocationError) {
             _showErrorDialog(state.message);
-          } else if (state is LocationOperationSuccess) {
+          } else if (state is LocationSuccess) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.message),
@@ -287,6 +181,8 @@ class _LocationPageViewState extends State<_LocationPageView> {
           } else if (state is LocationEmpty) {
             return _buildEmptyState();
           } else if (state is LocationLoaded) {
+            return _buildLocationsList(state.locations);
+          } else if (state is LocationSuccess) {
             return _buildLocationsList(state.locations);
           } else if (state is LocationError) {
             return _buildErrorState(state.message);
@@ -303,11 +199,9 @@ class _LocationPageViewState extends State<_LocationPageView> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // 3D Illustration placeholder - using a custom widget
           _build3DIllustration(),
           const SizedBox(height: 40),
           
-          // No saved location text
           const Text(
             'No saved location.',
             style: TextStyle(
@@ -318,7 +212,6 @@ class _LocationPageViewState extends State<_LocationPageView> {
           ),
           const SizedBox(height: 12),
           
-          // Subtitle
           Text(
             'There are no saved locations; click the button below to add one.',
             style: TextStyle(
@@ -330,7 +223,6 @@ class _LocationPageViewState extends State<_LocationPageView> {
           ),
           const SizedBox(height: 60),
           
-          // Add new location button
           SizedBox(
             width: double.infinity,
             height: 56,
@@ -355,7 +247,6 @@ class _LocationPageViewState extends State<_LocationPageView> {
           ),
           const SizedBox(height: 16),
           
-          // Use current location button
           TextButton(
             onPressed: _isLoading ? null : _useCurrentLocation,
             child: _isLoading
@@ -383,12 +274,11 @@ class _LocationPageViewState extends State<_LocationPageView> {
 
   Widget _build3DIllustration() {
     return Image.asset(
-      'assets/images/location.jpg', // Using the location image from assets
+      'assets/images/location.jpg',
       width: 200,
       height: 200,
       fit: BoxFit.cover,
       errorBuilder: (context, error, stackTrace) {
-        // Fallback if image doesn't exist
         return Container(
           width: 200,
           height: 200,
@@ -433,9 +323,9 @@ class _LocationPageViewState extends State<_LocationPageView> {
                   onDelete: () {
                     _showDeleteConfirmationDialog(location);
                   },
-                    onSetPrimary: () {
-                      context.read<LocationBloc>().add(ChangePrimaryLocation(location.id));
-                    },
+                  onSetPrimary: () {
+                    context.read<LocationBloc>().add(SetPrimaryLocation(location.id));
+                  },
                 );
               },
             ),
@@ -455,7 +345,7 @@ class _LocationPageViewState extends State<_LocationPageView> {
                 elevation: 0,
               ),
               child: const Text(
-                'Select primary location',
+                'Add new location',
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
@@ -494,7 +384,7 @@ class _LocationPageViewState extends State<_LocationPageView> {
             const SizedBox(height: 24),
             ElevatedButton(
               onPressed: () {
-                context.read<LocationBloc>().add(const LoadAllLocations());
+                context.read<LocationBloc>().add(const LoadLocations());
               },
               child: const Text('Retry'),
             ),
@@ -503,7 +393,6 @@ class _LocationPageViewState extends State<_LocationPageView> {
       ),
     );
   }
-
 }
 
 class _LocationCard extends StatelessWidget {
@@ -685,5 +574,4 @@ class _LocationCard extends StatelessWidget {
       ),
     );
   }
-
 }

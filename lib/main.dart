@@ -9,6 +9,7 @@ import 'features/auth/presentation/bloc/auth_bloc.dart';
 import 'features/booking/presentation/bloc/booking_bloc.dart';
 import 'features/home/presentation/bloc/home_bloc.dart';
 import 'features/profile/presentation/bloc/profile_bloc.dart';
+import 'features/location/presentation/providers/location_provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -32,13 +33,15 @@ class ServiceBookingApp extends StatelessWidget {
         BlocProvider<BookingBloc>(create: (_) => BookingBloc()),
         BlocProvider<ProfileBloc>(create: (_) => ProfileBloc()),
       ],
-      child: MaterialApp.router(
-        title: 'Service Booking',
-        theme: AppTheme.lightTheme,
-        darkTheme: AppTheme.darkTheme,
-        themeMode: ThemeMode.system,
-        routerConfig: AppRouter.router,
-        debugShowCheckedModeBanner: false,
+      child: LocationProvider(
+        child: MaterialApp.router(
+          title: 'Service Booking',
+          theme: AppTheme.lightTheme,
+          darkTheme: AppTheme.darkTheme,
+          themeMode: ThemeMode.system,
+          routerConfig: AppRouter.router,
+          debugShowCheckedModeBanner: false,
+        ),
       ),
     );
   }

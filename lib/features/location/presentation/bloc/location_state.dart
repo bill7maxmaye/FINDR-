@@ -19,20 +19,10 @@ class LocationLoading extends LocationState {
 class LocationLoaded extends LocationState {
   final List<LocationEntity> locations;
 
-  const LocationLoaded({
-    required this.locations,
-  });
+  const LocationLoaded({required this.locations});
 
   @override
   List<Object?> get props => [locations];
-
-  LocationLoaded copyWith({
-    List<LocationEntity>? locations,
-  }) {
-    return LocationLoaded(
-      locations: locations ?? this.locations,
-    );
-  }
 }
 
 class LocationEmpty extends LocationState {
@@ -48,11 +38,11 @@ class LocationError extends LocationState {
   List<Object?> get props => [message];
 }
 
-class LocationOperationSuccess extends LocationState {
+class LocationSuccess extends LocationState {
   final String message;
   final List<LocationEntity> locations;
 
-  const LocationOperationSuccess({
+  const LocationSuccess({
     required this.message,
     required this.locations,
   });
@@ -60,13 +50,3 @@ class LocationOperationSuccess extends LocationState {
   @override
   List<Object?> get props => [message, locations];
 }
-
-class LocationDetailLoaded extends LocationState {
-  final LocationEntity location;
-
-  const LocationDetailLoaded(this.location);
-
-  @override
-  List<Object?> get props => [location];
-}
-

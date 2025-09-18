@@ -108,7 +108,7 @@ class _HomeScreenState extends State<HomeScreen> {
           IconButton(
             icon: const Icon(Icons.location_on_outlined, color: Colors.black87),
             onPressed: () {
-              context.push('/location');
+              context.go('/location');
             },
           ),
           IconButton(
