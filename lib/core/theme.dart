@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class AppTheme {
   // Colors
   static const Color primaryColor = Color(0xFF0E4768);
-  static const Color secondaryColor = Color(0xFF03DAC6);
+  static const Color secondaryColor = Color(0xFFF3773F);
   static const Color errorColor = Color(0xFFB00020);
   static const Color successColor = Color(0xFF4CAF50);
   static const Color warningColor = Color(0xFFFF9800);
@@ -24,16 +24,15 @@ class AppTheme {
         backgroundColor: primaryColor,
         foregroundColor: Colors.white,
         titleTextStyle: TextStyle(
-    color: Colors.white,                // Specifically the title text
-    fontSize: 20,
-    fontWeight: FontWeight.w600,
-  ),
-  iconTheme: IconThemeData(
-    color: Colors.white,                // Specifically icons
-  ),
-  actionsIconTheme: IconThemeData(
-    color: Colors.white,                // Specifically action icons
-  ),
+        color: Colors.white,                // Specifically the title text
+        fontSize: 20,
+        fontWeight: FontWeight.w600,),
+        iconTheme: IconThemeData(
+          color: secondaryColor,                // Specifically icons
+        ),
+        actionsIconTheme: IconThemeData(
+          color: secondaryColor,                // Specifically action icons
+        ),
         elevation: 0,
         centerTitle: true,
       ),
