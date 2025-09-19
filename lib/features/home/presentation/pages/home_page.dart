@@ -104,7 +104,12 @@ class _HomeScreenState extends State<HomeScreen> {
         elevation: 0,
         leading: Padding(
           padding: const EdgeInsets.all(12.0),
-          child: Image.asset('assets/images/logo.jpg', height: 28),
+          //make it a circle
+          child: CircleAvatar(
+            backgroundImage: AssetImage('assets/images/logo.jpg'),
+            radius: 28,
+          ),
+          // child: Image.asset('assets/images/person.jpg', height: 28, width: 28),
         ),
         actions: [
           IconButton(
