@@ -115,23 +115,23 @@ class _CategoriesPageState extends State<CategoriesPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
           widget.mainCategory.isEmpty ? 'Categories' : widget.mainCategory,
-          style: const TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.bold,
-          ),
+          // style: const TextStyle(
+          //   color: Colors.black,
+          //   fontWeight: FontWeight.bold,
+          // ),
         ),
         centerTitle: true,
         actions: [
           IconButton(
-            icon: const Icon(Icons.list, color: Colors.black),
+            icon: const Icon(Icons.list),
             onPressed: () {},
           ),
         ],

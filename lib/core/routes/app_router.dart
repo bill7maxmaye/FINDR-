@@ -17,14 +17,14 @@ import '../../features/location/presentation/pages/edit_location_page.dart';
 
 class AppRouter {
   // Development flag - set to true to bypass authentication for testing
-  static const bool _isDevelopment = false;
+  static const bool _isDevelopment = true;
   
   static final GoRouter _router = GoRouter(
     initialLocation: '/home',
     redirect: (context, state) {
       // Skip authentication check in development
       if (_isDevelopment) {
-        return null;
+        return '/home';
       }
       
       // Check authentication status

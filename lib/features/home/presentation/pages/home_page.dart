@@ -98,7 +98,9 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        //use theme data
+        // backgroundColor: Theme.of(context).colorScheme.primary,
+        // foregroundColor: Theme.of(context).colorScheme.onSurface,
         elevation: 0,
         leading: Padding(
           padding: const EdgeInsets.all(12.0),
@@ -106,17 +108,17 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.location_on_outlined, color: Colors.black87),
+            icon: const Icon(Icons.location_on_outlined),
             onPressed: () {
               context.go('/location');
             },
           ),
           IconButton(
-            icon: const Icon(Icons.chat_bubble_outline, color: Colors.black87),
+            icon: const Icon(Icons.chat_bubble_outline),
             onPressed: () {},
           ),
           IconButton(
-            icon: const Icon(Icons.notifications_none, color: Colors.black87),
+            icon: const Icon(Icons.notifications_none),
             onPressed: () {},
           ),
         ],
