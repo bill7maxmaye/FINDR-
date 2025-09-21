@@ -6,6 +6,7 @@ import '../../features/auth/presentation/bloc/auth_state.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/auth/presentation/pages/register_page.dart';
 import '../../features/home/presentation/pages/home_page.dart';
+import '../../features/home/presentation/pages/categories_page.dart';
 import '../../features/profile/presentation/pages/profile_page.dart';
 import '../../features/booking/presentation/pages/bookings_page.dart';
 import '../../features/auth/presentation/pages/forgot_password_page.dart';
@@ -14,6 +15,8 @@ import '../../features/auth/presentation/pages/verify_email_page.dart';
 import '../../features/location/presentation/pages/location_page.dart';
 import '../../features/location/presentation/pages/add_location_page.dart';
 import '../../features/location/presentation/pages/edit_location_page.dart';
+import '../../features/task_posting/presentation/pages/task_posting_page.dart';
+import '../theme.dart';
 
 class AppRouter {
   // Development flag - set to true to bypass authentication for testing
@@ -22,9 +25,9 @@ class AppRouter {
   static final GoRouter _router = GoRouter(
     initialLocation: '/home',
     redirect: (context, state) {
-      // Skip authentication check in development
+      // Skip authentication check in development - allow all routes
       if (_isDevelopment) {
-        return '/home';
+        return null;
       }
       
       // Check authentication status
@@ -67,6 +70,16 @@ class AppRouter {
         builder: (context, state) => const HomeScreen(),
       ),
       GoRoute(
+        path: '/categories',
+        name: 'categories',
+        builder: (context, state) {
+          final category = state.uri.queryParameters['category'];
+          return CategoriesPage(
+            mainCategory: category ?? '',
+          );
+        },
+      ),
+      GoRoute(
         path: '/profile',
         name: 'profile',
         builder: (context, state) => const ProfilePage(),
@@ -92,6 +105,18 @@ class AppRouter {
         builder: (context, state) {
           final location = state.extra as dynamic;
           return EditLocationPage(location: location);
+        },
+      ),
+      GoRoute(
+        path: '/post-task',
+        name: 'post-task',
+        builder: (context, state) {
+          final category = state.uri.queryParameters['category'];
+          final subcategory = state.uri.queryParameters['subcategory'];
+          return TaskPostingPage(
+            category: category,
+            subcategory: subcategory,
+          );
         },
       ),
       

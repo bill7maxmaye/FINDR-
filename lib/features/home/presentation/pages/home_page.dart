@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
-import 'package:service_booking/features/home/presentation/pages/categories_page.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -83,15 +82,6 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  // Navigation method to CategoriesPage - Updated to show all categories when mainCategory is empty
-  void _navigateToCategoriesPage(BuildContext context, String mainCategory) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => CategoriesPage(mainCategory: mainCategory),
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -232,11 +222,9 @@ class _HomeScreenState extends State<HomeScreen> {
                             title: Text(sub['name']),
                             subtitle: Text(sub['mainCategory']),
                             onTap: () {
-                              // Navigate to the specific category page
-                              _navigateToCategoriesPage(
-                                context,
-                                sub['mainCategory'],
-                              );
+                              final category = sub['mainCategory'];
+                              final subcategory = sub['name'];
+                              context.go('/post-task?category=${Uri.encodeComponent(category)}&subcategory=${Uri.encodeComponent(subcategory)}');
                             },
                           );
                         },
@@ -251,13 +239,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   'Popular Category',
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                 ),
-                TextButton(
-                  onPressed: () => _navigateToCategoriesPage(context, ''),
-                  child: const Text(
-                    'See All',
-                    style: TextStyle(color: Colors.green),
+                  TextButton(
+                    onPressed: () => context.push('/categories'),
+                    child: const Text(
+                      'See All',
+                      style: TextStyle(color: Colors.green),
+                    ),
                   ),
-                ),
               ],
             ),
             const SizedBox(height: 12),
@@ -274,25 +262,22 @@ class _HomeScreenState extends State<HomeScreen> {
                 _CategoryCard(
                   title: 'House Cleaning',
                   image: 'assets/images/houseCleaning.jpg',
-                  onTap: () =>
-                      _navigateToCategoriesPage(context, 'House Cleaning'),
+                  onTap: () => context.push('/categories?category=${Uri.encodeComponent('House Cleaning')}'),
                 ),
                 _CategoryCard(
                   title: 'Help Moving',
                   image: 'assets/images/helpMoving.jpg',
-                  onTap: () =>
-                      _navigateToCategoriesPage(context, 'Help Moving'),
+                  onTap: () => context.push('/categories?category=${Uri.encodeComponent('Help Moving')}'),
                 ),
                 _CategoryCard(
                   title: 'Painting',
                   image: 'assets/images/painting.jpg',
-                  onTap: () => _navigateToCategoriesPage(context, 'Painting'),
+                  onTap: () => context.push('/categories?category=${Uri.encodeComponent('Painting')}'),
                 ),
                 _CategoryCard(
                   title: 'Electrical Help',
                   image: 'assets/images/electricRepair.jpg',
-                  onTap: () =>
-                      _navigateToCategoriesPage(context, 'Electrical Help'),
+                  onTap: () => context.push('/categories?category=${Uri.encodeComponent('Electrical Help')}'),
                 ),
               ],
             ),

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 
 class CategoriesPage extends StatefulWidget {
   final String mainCategory;
@@ -202,8 +203,10 @@ class _CategoriesPageState extends State<CategoriesPage> {
                 title: Text(sub['name']),
                 subtitle: Text(sub['mainCategory']),
                 onTap: () {
-                  // Handle subcategory tap from search results
-                  print('${sub['name']} from ${sub['mainCategory']} tapped');
+                  // Navigate to task posting page with selected subcategory
+                  final category = sub['mainCategory'];
+                  final subcategory = sub['name'];
+                  context.go('/post-task?category=${Uri.encodeComponent(category)}&subcategory=${Uri.encodeComponent(subcategory)}');
                 },
               );
             },
@@ -225,8 +228,10 @@ class _CategoriesPageState extends State<CategoriesPage> {
           icon: cat['icon'],
           label: cat['name'],
           onTap: () {
-            // Handle subcategory tap from grid
-            print('${cat['name']} tapped');
+            // Navigate to task posting page with selected subcategory
+            final category = cat['mainCategory'];
+            final subcategory = cat['name'];
+            context.go('/post-task?category=${Uri.encodeComponent(category)}&subcategory=${Uri.encodeComponent(subcategory)}');
           },
         );
       },
