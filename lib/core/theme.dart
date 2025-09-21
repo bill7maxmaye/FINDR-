@@ -28,10 +28,10 @@ class AppTheme {
         fontSize: 20,
         fontWeight: FontWeight.w600,),
         iconTheme: IconThemeData(
-          color: secondaryColor,                // Specifically icons
+          color: Colors.white,                // Specifically icons
         ),
         actionsIconTheme: IconThemeData(
-          color: secondaryColor,                // Specifically action icons
+          color: Colors.white,                // Specifically action icons
         ),
         elevation: 0,
         centerTitle: true,
