@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../core/theme.dart';
 import '../bloc/task_posting_bloc.dart';
 import '../bloc/task_posting_event.dart';
 import '../bloc/task_posting_state.dart';
+import '../../../booking/presentation/pages/provider_selection_page.dart';
 
 class StepNavigationBar extends StatelessWidget {
   const StepNavigationBar({super.key});
@@ -16,7 +18,7 @@ class StepNavigationBar extends StatelessWidget {
         
         final currentState = state;
         final isFirstStep = currentState.currentStep == 0;
-        final isLastStep = currentState.currentStep == 2;
+        final isLastStep = currentState.currentStep == 1;
         final canProceed = currentState.canProceedToNextStep;
         
         return Container(
@@ -66,7 +68,8 @@ class StepNavigationBar extends StatelessWidget {
                   onPressed: canProceed
                       ? () {
                           if (isLastStep) {
-                            context.read<TaskPostingBloc>().add(TaskPostingSubmit());
+                            // Navigate to provider selection page
+                            _navigateToProviderSelection(context, currentState);
                           } else {
                             context.read<TaskPostingBloc>().add(TaskPostingNextStep());
                           }
@@ -80,7 +83,7 @@ class StepNavigationBar extends StatelessWidget {
                     ),
                   ),
                   child: Text(
-                    isLastStep ? 'Submit Task' : 'Next',
+                    isLastStep ? 'Get Provider' : 'Next',
                     style: TextStyle(
                       color: canProceed ? Colors.white : Colors.grey[600],
                       fontWeight: FontWeight.w600,
@@ -92,6 +95,24 @@ class StepNavigationBar extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+
+  void _navigateToProviderSelection(BuildContext context, TaskPostingLoaded state) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ProviderSelectionPage(
+          category: state.category,
+          subcategory: state.subcategory,
+          location: state.location,
+          title: state.title,
+          summary: state.summary,
+          images: state.images,
+          budget: state.budget,
+          preferredDate: state.preferredDate,
+        ),
+      ),
     );
   }
 }

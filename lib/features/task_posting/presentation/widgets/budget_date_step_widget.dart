@@ -69,7 +69,7 @@ class _BudgetDateStepWidgetState extends State<BudgetDateStepWidget> {
           ),
           const SizedBox(height: 8),
           Text(
-            'Set your budget and preferred date for the service (both optional)',
+            'Set your budget and preferred date for the service (both completely optional)',
             style: AppTextStyles.bodyMedium.copyWith(
               color: AppTheme.textSecondaryColor,
             ),
@@ -119,7 +119,7 @@ class _BudgetDateStepWidgetState extends State<BudgetDateStepWidget> {
           ),
           const SizedBox(height: 8),
           Text(
-            'Leave empty to let providers suggest their rates',
+            'Leave empty to let providers suggest their rates - no validation required',
             style: AppTextStyles.bodySmall.copyWith(
               color: AppTheme.textSecondaryColor,
             ),
@@ -170,34 +170,13 @@ class _BudgetDateStepWidgetState extends State<BudgetDateStepWidget> {
                     ),
                   ),
                   const Spacer(),
-                  if (_selectedDate != null)
-                    GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          _selectedDate = null;
-                        });
-                        widget.onPreferredDateChanged(null);
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: const BoxDecoration(
-                          color: AppTheme.errorColor,
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.close,
-                          size: 16,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
                 ],
               ),
             ),
           ),
           const SizedBox(height: 8),
           Text(
-            'Leave empty to let providers suggest available dates',
+            'Leave empty to let providers suggest available dates - no validation required',
             style: AppTextStyles.bodySmall.copyWith(
               color: AppTheme.textSecondaryColor,
             ),

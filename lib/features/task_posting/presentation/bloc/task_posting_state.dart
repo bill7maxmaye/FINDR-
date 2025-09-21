@@ -58,7 +58,7 @@ class TaskPostingLoaded extends TaskPostingState {
       case 0: // Location + Details step
         return location.isNotEmpty && title.isNotEmpty && summary.isNotEmpty;
       case 1: // Budget and Date step
-        return true; // Budget and date are optional
+        return true; // No validation needed - all fields are optional
       default:
         return false;
     }

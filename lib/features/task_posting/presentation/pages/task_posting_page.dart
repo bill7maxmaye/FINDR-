@@ -9,6 +9,7 @@ import '../widgets/location_details_step_widget.dart';
 import '../widgets/budget_date_step_widget.dart';
 import '../widgets/step_indicator.dart';
 import '../widgets/step_navigation_bar.dart';
+import '../../../booking/presentation/pages/provider_selection_page.dart';
 
 class TaskPostingPage extends StatefulWidget {
   final String? category;
@@ -45,16 +46,23 @@ class _TaskPostingPageState extends State<TaskPostingPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppTheme.primaryColor,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppTheme.textPrimaryColor),
-          onPressed: () => context.pop(),
+          icon: const Icon(Icons.arrow_back, color: AppTheme.iconColor),
+          onPressed: () {
+            if (Navigator.of(context).canPop()) {
+              Navigator.of(context).pop();
+            } else {
+              // If there's nothing to pop, go to home page
+              context.go('/home');
+            }
+          },
         ),
         title: const Text(
           'FINDR',
           style: TextStyle(
-            color: AppTheme.primaryColor,
+            color: AppTheme.iconColor,
             fontWeight: FontWeight.bold,
             fontSize: 20,
           ),
@@ -62,11 +70,11 @@ class _TaskPostingPageState extends State<TaskPostingPage> {
         centerTitle: true,
         actions: [
           IconButton(
-            icon: const Icon(Icons.search, color: AppTheme.textPrimaryColor),
+            icon: const Icon(Icons.search, color: AppTheme.iconColor),
             onPressed: () {},
           ),
           IconButton(
-            icon: const Icon(Icons.notifications_none, color: AppTheme.textPrimaryColor),
+            icon: const Icon(Icons.notifications_none, color: AppTheme.iconColor),
             onPressed: () {},
           ),
           const Padding(
