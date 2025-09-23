@@ -320,39 +320,7 @@ class ProviderCard extends StatelessWidget {
   }
 
   Widget _getProfileImage(Map<String, dynamic> provider) {
-    // Check if profile image exists at top level
-    if (provider['profileImage'] != null && provider['profileImage'].isNotEmpty) {
-      return Image.network(
-        provider['profileImage'],
-        width: 60,
-        height: 60,
-        fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) {
-          return _buildAssetImageAvatar();
-        },
-      );
-    }
-    
-    // Check if profile image exists in services (old structure)
-    if (provider['services'] != null && provider['services'] is List) {
-      final services = provider['services'] as List;
-      if (services.isNotEmpty && services[0] is Map) {
-        final firstService = services[0] as Map<String, dynamic>;
-        if (firstService['profileImage'] != null && firstService['profileImage'].isNotEmpty) {
-          return Image.network(
-            firstService['profileImage'],
-            width: 60,
-            height: 60,
-            fit: BoxFit.cover,
-            errorBuilder: (context, error, stackTrace) {
-              return _buildAssetImageAvatar();
-            },
-          );
-        }
-      }
-    }
-    
-    // Fallback to asset image or initials avatar
+    // Always use the person.jpg asset image
     return _buildAssetImageAvatar();
   }
 

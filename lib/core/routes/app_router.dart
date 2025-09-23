@@ -16,6 +16,8 @@ import '../../features/location/presentation/pages/location_page.dart';
 import '../../features/location/presentation/pages/add_location_page.dart';
 import '../../features/location/presentation/pages/edit_location_page.dart';
 import '../../features/task_posting/presentation/pages/task_posting_page.dart';
+import '../../features/profile/presentation/pages/provider_profile_detail_page.dart';
+import '../../features/profile/presentation/bloc/provider_profile_bloc.dart';
 import '../theme.dart';
 
 class AppRouter {
@@ -116,6 +118,24 @@ class AppRouter {
           return TaskPostingPage(
             category: category,
             subcategory: subcategory,
+          );
+        },
+      ),
+      GoRoute(
+        path: '/provider-profile',
+        name: 'provider-profile',
+        builder: (context, state) {
+          print('Provider profile route called');
+          final extra = state.extra as Map<String, dynamic>?;
+          final providerId = extra?['providerId'] ?? '1';
+          final providerName = extra?['providerName'] ?? 'Provider';
+          print('Provider ID: $providerId, Provider name: $providerName');
+          return BlocProvider(
+            create: (context) => ProviderProfileBloc(),
+            child: ProviderProfileDetailPage(
+              providerId: providerId,
+              providerName: providerName,
+            ),
           );
         },
       ),

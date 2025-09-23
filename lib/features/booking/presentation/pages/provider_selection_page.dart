@@ -62,7 +62,7 @@ class _ProviderSelectionPageState extends State<ProviderSelectionPage> {
       'taskCount': 105,
       'price': 95,
       'distance': 1.2,
-      'profileImage': 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face',
+      'profileImage': 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face',
       'description': 'Professional cleaning services with eco-friendly products. I provide deep cleaning, regular maintenance, and specialized services. Your satisfaction is guaranteed!',
     },
     {
@@ -231,14 +231,26 @@ class _ProviderSelectionPageState extends State<ProviderSelectionPage> {
   }
 
   void _viewProviderProfile(Map<String, dynamic> provider) {
-    // Handle view profile - navigate to provider profile page
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Viewing ${provider['name']}\'s profile'),
-        backgroundColor: AppTheme.primaryColor,
-      ),
-    );
-    // TODO: Navigate to provider profile page
+    // Navigate to provider profile page
+    print('Navigating to provider profile: ${provider['id']}');
+    print('Provider name: ${provider['name']}');
+    try {
+      context.push(
+        '/provider-profile',
+        extra: {
+          'providerId': provider['id'],
+          'providerName': provider['name'],
+        },
+      );
+    } catch (e) {
+      print('Navigation error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Navigation error: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   void _showFilterBottomSheet() {
