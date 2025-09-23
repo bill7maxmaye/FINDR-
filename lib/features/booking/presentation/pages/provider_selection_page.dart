@@ -45,61 +45,46 @@ class _ProviderSelectionPageState extends State<ProviderSelectionPage> {
   final List<Map<String, dynamic>> _providers = [
     {
       'id': '1',
-      'name': 'Victoria Popa',
-      'rating': 3.0,
-      'distance': 10.0,
-      'served': 105,
-      'experience': 8,
-      'services': [
-        {
-          'name': 'Ac deep cleaning',
-          'price': 12.0,
-          'duration': '30mins',
-          'minServicemen': 2,
-          'description': 'Foamjet technology removes dust 2x deeper.',
-          'image': 'assets/images/ac_cleaning_1.jpg',
-          'isAdded': true,
-        }
-      ],
+      'name': 'Karmel A.',
+      'rating': 4.9,
+      'reviewCount': 358,
+      'taskCount': 811,
+      'price': 129,
+      'distance': 2.5,
+      'profileImage': 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
+      'description': 'Why Choose me? • Price include TWO TASKERS 👥👥 of my team (Labor only) • never last minute cancellation • Last-minute availability • 2h minimum • your belongings are moved safely with caution! satisfaction guaranteed!! Let\'s Make Your Move a Smooth One! Book us today and see why...',
     },
     {
       'id': '2',
-      'name': 'Stella Milevski',
-      'rating': 3.0,
-      'distance': 10.0,
-      'served': 141,
-      'experience': 7,
-      'services': [
-        {
-          'name': 'Anti-rust deep clean',
-          'price': 12.0,
-          'duration': '30mins',
-          'minServicemen': 1,
-          'description': 'Foamjet technology removes dust 2x deeper.',
-          'image': 'assets/images/ac_cleaning_2.jpg',
-          'isAdded': false,
-        }
-      ],
+      'name': 'Victoria Popa',
+      'rating': 4.7,
+      'reviewCount': 245,
+      'taskCount': 105,
+      'price': 95,
+      'distance': 1.2,
+      'profileImage': 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face',
+      'description': 'Professional cleaning services with eco-friendly products. I provide deep cleaning, regular maintenance, and specialized services. Your satisfaction is guaranteed!',
     },
     {
       'id': '3',
+      'name': 'Stella Milevski',
+      'rating': 4.8,
+      'reviewCount': 189,
+      'taskCount': 141,
+      'price': 110,
+      'distance': 3.1,
+      'description': 'Experienced cleaner with attention to detail. I offer comprehensive cleaning solutions for homes and offices. Flexible scheduling and competitive rates.',
+    },
+    {
+      'id': '4',
       'name': 'Kurt Bates',
-      'rating': 3.0,
-      'distance': 10.0,
-      'served': 142,
-      'experience': 5.5,
-      'services': [
-        {
-          'name': 'AC Maintenance',
-          'price': 15.0,
-          'duration': '45mins',
-          'minServicemen': 1,
-          'description': 'Complete AC maintenance and cleaning.',
-          'image': 'assets/images/ac_cleaning_3.jpg',
-          'isAdded': false,
-          'discount': 10,
-        }
-      ],
+      'rating': 4.6,
+      'reviewCount': 156,
+      'taskCount': 142,
+      'price': 85,
+      'distance': 4.2,
+      'profileImage': 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
+      'description': 'Reliable and professional service provider. Specialized in maintenance and repair work. Quick response time and quality workmanship guaranteed.',
     },
   ];
 
@@ -217,10 +202,13 @@ class _ProviderSelectionPageState extends State<ProviderSelectionPage> {
                 final provider = _providers[index];
                 return ProviderCard(
                   provider: provider,
-                  onServiceAdded: (serviceId) {
-                    setState(() {
-                      // Update service added state
-                    });
+                  onSelectProvider: () {
+                    // Handle provider selection
+                    _selectProvider(provider);
+                  },
+                  onViewProfile: () {
+                    // Handle view profile
+                    _viewProviderProfile(provider);
                   },
                 );
               },
@@ -229,6 +217,28 @@ class _ProviderSelectionPageState extends State<ProviderSelectionPage> {
         ],
       ),
     );
+  }
+
+  void _selectProvider(Map<String, dynamic> provider) {
+    // Handle provider selection - navigate to booking confirmation or next step
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Selected ${provider['name']}'),
+        backgroundColor: AppTheme.primaryColor,
+      ),
+    );
+    // TODO: Navigate to booking confirmation page
+  }
+
+  void _viewProviderProfile(Map<String, dynamic> provider) {
+    // Handle view profile - navigate to provider profile page
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Viewing ${provider['name']}\'s profile'),
+        backgroundColor: AppTheme.primaryColor,
+      ),
+    );
+    // TODO: Navigate to provider profile page
   }
 
   void _showFilterBottomSheet() {
