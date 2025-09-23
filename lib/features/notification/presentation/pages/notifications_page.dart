@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../core/theme.dart';
 import '../bloc/notification_bloc.dart';
 import '../bloc/notification_event.dart';
@@ -30,6 +31,17 @@ class _NotificationsPageState extends State<NotificationsPage> {
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
         elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            if (Navigator.of(context).canPop()) {
+              Navigator.of(context).pop();
+            } else {
+              // If there's nothing to pop, go to home page
+              context.go('/home');
+            }
+          },
+        ),
         title: const Text(
           'Notifications',
           style: TextStyle(
