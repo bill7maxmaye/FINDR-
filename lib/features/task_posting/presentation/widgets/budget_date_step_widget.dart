@@ -78,8 +78,8 @@ class _BudgetDateStepWidgetState extends State<BudgetDateStepWidget> {
         
           // Budget Section
           Text(
-            'Budget (Optional)',
-            style: AppTextStyles.heading3.copyWith(
+            'Budget',
+            style: AppTextStyles.bodyLarge.copyWith(
               color: AppTheme.textPrimaryColor,
             ),
           ),
@@ -119,7 +119,7 @@ class _BudgetDateStepWidgetState extends State<BudgetDateStepWidget> {
           ),
           const SizedBox(height: 8),
           Text(
-            'Leave empty to let providers suggest their rates - no validation required',
+            'Input your budget to narrow down your search.',
             style: AppTextStyles.bodySmall.copyWith(
               color: AppTheme.textSecondaryColor,
             ),
@@ -129,8 +129,8 @@ class _BudgetDateStepWidgetState extends State<BudgetDateStepWidget> {
           
           // Preferred Date Section
           Text(
-            'Preferred Date (Optional)',
-            style: AppTextStyles.heading3.copyWith(
+            'Preferred Date',
+            style: AppTextStyles.bodyLarge.copyWith(
               color: AppTheme.textPrimaryColor,
             ),
           ),
@@ -176,7 +176,7 @@ class _BudgetDateStepWidgetState extends State<BudgetDateStepWidget> {
           ),
           const SizedBox(height: 8),
           Text(
-            'Leave empty to let providers suggest available dates - no validation required',
+            'When do you need this done?',
             style: AppTextStyles.bodySmall.copyWith(
               color: AppTheme.textSecondaryColor,
             ),
