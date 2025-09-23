@@ -18,6 +18,13 @@ import '../../features/location/presentation/pages/edit_location_page.dart';
 import '../../features/task_posting/presentation/pages/task_posting_page.dart';
 import '../../features/profile/presentation/pages/provider_profile_detail_page.dart';
 import '../../features/profile/presentation/bloc/provider_profile_bloc.dart';
+import '../../features/notification/presentation/pages/notifications_page.dart';
+import '../../features/notification/presentation/bloc/notification_bloc.dart';
+import '../../features/notification/data/datasources/notification_api_impl.dart';
+import '../../features/notification/data/repositories/notification_repository_impl.dart';
+import '../../features/notification/domain/usecases/get_notifications.dart';
+import '../../features/notification/domain/usecases/mark_notification_as_read.dart';
+import '../../features/notification/domain/usecases/mark_all_as_read.dart';
 import '../theme.dart';
 
 class AppRouter {
@@ -136,6 +143,24 @@ class AppRouter {
               providerId: providerId,
               providerName: providerName,
             ),
+          );
+        },
+      ),
+      GoRoute(
+        path: '/notifications',
+        name: 'notifications',
+        builder: (context, state) {
+          return BlocProvider(
+            create: (context) {
+              final notificationApi = NotificationApiImpl();
+              final notificationRepository = NotificationRepositoryImpl(notificationApi);
+              return NotificationBloc(
+                getNotifications: GetNotifications(notificationRepository),
+                markAsRead: MarkNotificationAsRead(notificationRepository),
+                markAllAsRead: MarkAllAsRead(notificationRepository),
+              );
+            },
+            child: const NotificationsPage(),
           );
         },
       ),
