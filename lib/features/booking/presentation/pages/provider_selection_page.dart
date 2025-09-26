@@ -3,8 +3,6 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme.dart';
 import '../widgets/provider_card.dart';
 import '../widgets/filter_bottom_sheet.dart';
-import '../widgets/search_bar_widget.dart';
-import '../widgets/subcategory_tabs.dart';
 
 class ProviderSelectionPage extends StatefulWidget {
   final String category;
@@ -33,7 +31,6 @@ class ProviderSelectionPage extends StatefulWidget {
 }
 
 class _ProviderSelectionPageState extends State<ProviderSelectionPage> {
-  String _searchQuery = '';
   int _activeFilterCount = 0;
   List<String> _selectedProviders = [];
   List<String> _selectedRatings = [];
@@ -41,6 +38,10 @@ class _ProviderSelectionPageState extends State<ProviderSelectionPage> {
   double _maxPrice = 50.0;
   double _maxDistance = 30.0;
   bool _availableOnly = true;
+  String? _selectedKifleKetema;
+  String? _selectedWoreda;
+  DateTime? _selectedDate;
+  List<String> _selectedTimeSlots = [];
 
   final List<Map<String, dynamic>> _providers = [
     {
@@ -88,13 +89,19 @@ class _ProviderSelectionPageState extends State<ProviderSelectionPage> {
     },
   ];
 
-  final List<String> _subcategories = [
-    'Ac Repair',
-    'Installation',
-    'Hanging',
-    'Servicing',
-    'Paint',
-  ];
+  @override
+  void initState() {
+    super.initState();
+    // Add test filters to see the chips
+    _selectedKifleKetema = 'Bole';
+    _selectedWoreda = 'Bole Sub City';
+    _selectedDate = DateTime.now();
+    _selectedTimeSlots = ['morning'];
+    _minPrice = 20.0;
+    _maxPrice = 100.0;
+    _selectedRatings = ['4', '5'];
+    _activeFilterCount = _calculateActiveFilters();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -124,74 +131,48 @@ class _ProviderSelectionPageState extends State<ProviderSelectionPage> {
         ),
         centerTitle: true,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.search, color: AppTheme.iconColor),
-            onPressed: () {},
-          ),
-          Stack(
-            children: [
-              IconButton(
-                icon: const Icon(Icons.filter_list, color: AppTheme.iconColor),
-                onPressed: () => _showFilterBottomSheet(),
-              ),
-              if (_activeFilterCount > 0)
-                Positioned(
-                  right: 8,
-                  top: 8,
-                  child: Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: const BoxDecoration(
-                      color: AppTheme.errorColor,
-                      shape: BoxShape.circle,
-                    ),
-                    constraints: const BoxConstraints(
-                      minWidth: 16,
-                      minHeight: 16,
-                    ),
-                    child: Text(
-                      '$_activeFilterCount',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
+          Padding(
+            padding: const EdgeInsets.only(right: 16.0),
+            child: Stack(
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.filter_list, color: AppTheme.iconColor),
+                  onPressed: () => _showFilterBottomSheet(),
+                ),
+                if (_activeFilterCount > 0)
+                  Positioned(
+                    right: 8,
+                    top: 8,
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: const BoxDecoration(
+                        color: AppTheme.errorColor,
+                        shape: BoxShape.circle,
                       ),
-                      textAlign: TextAlign.center,
+                      constraints: const BoxConstraints(
+                        minWidth: 16,
+                        minHeight: 16,
+                      ),
+                      child: Text(
+                        '$_activeFilterCount',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
                     ),
                   ),
-                ),
-            ],
-          ),
-          const Padding(
-            padding: EdgeInsets.only(right: 16.0),
-            child: CircleAvatar(
-              radius: 16,
-              backgroundImage: AssetImage('assets/images/person.jpg'),
+              ],
             ),
           ),
         ],
       ),
       body: Column(
         children: [
-          // Search Bar
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: SearchBarWidget(
-              onChanged: (value) {
-                setState(() {
-                  _searchQuery = value;
-                });
-              },
-            ),
-          ),
-
-          // Subcategory Tabs
-          SubcategoryTabs(
-            subcategories: _subcategories,
-            selectedIndex: 0,
-            onTabChanged: (index) {
-              // Handle subcategory change
-            },
-          ),
+          // Active Filters
+          _buildActiveFilters(),
 
           // Provider List
           Expanded(
@@ -253,6 +234,110 @@ class _ProviderSelectionPageState extends State<ProviderSelectionPage> {
     }
   }
 
+  Widget _buildActiveFilters() {
+    List<Widget> filterChips = [];
+    
+    // Location filter
+    if (_selectedKifleKetema != null && _selectedWoreda != null) {
+      filterChips.add(_buildFilterChip(
+        '${_selectedKifleKetema}, ${_selectedWoreda}',
+        Icons.location_on,
+        () => _removeLocationFilter(),
+      ));
+    }
+    
+    // Price range filter
+    if (_minPrice > 10.0 || _maxPrice < 50.0) {
+      filterChips.add(_buildFilterChip(
+        '${_minPrice.toInt()}-${_maxPrice.toInt()} Birr',
+        Icons.attach_money,
+        () => _removePriceFilter(),
+      ));
+    }
+    
+    // Rating filter
+    if (_selectedRatings.isNotEmpty) {
+      filterChips.add(_buildFilterChip(
+        '${_selectedRatings.join(', ')} Stars',
+        Icons.star,
+        () => _removeRatingFilter(),
+      ));
+    }
+    
+    // Date filter
+    if (_selectedDate != null) {
+      final dateStr = '${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year}';
+      filterChips.add(_buildFilterChip(
+        dateStr,
+        Icons.calendar_today,
+        () => _removeDateFilter(),
+      ));
+    }
+    
+    // Time slots filter
+    if (_selectedTimeSlots.isNotEmpty) {
+      filterChips.add(_buildFilterChip(
+        _selectedTimeSlots.join(', '),
+        Icons.access_time,
+        () => _removeTimeSlotsFilter(),
+      ));
+    }
+    
+    if (filterChips.isEmpty) {
+      return const SizedBox.shrink();
+    }
+    
+    return Container(
+      padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: [
+            ...filterChips,
+          ],
+        ),
+      ),
+    );
+  }
+  
+  Widget _buildFilterChip(String label, IconData icon, VoidCallback onRemove) {
+    return Container(
+      margin: const EdgeInsets.only(right: 8),
+      child: GestureDetector(
+        onTap: () {
+          onRemove();
+        },
+        child: Chip(
+          label: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: 16, color: AppTheme.primaryColor),
+              const SizedBox(width: 4),
+              Text(
+                label,
+                style: AppTextStyles.bodySmall.copyWith(
+                  color: AppTheme.primaryColor,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(width: 4),
+              Icon(
+                Icons.close,
+                size: 16,
+                color: AppTheme.primaryColor,
+              ),
+            ],
+          ),
+          backgroundColor: AppTheme.primaryColor.withOpacity(0.1),
+          side: BorderSide(color: AppTheme.primaryColor.withOpacity(0.3)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+        ),
+      ),
+    );
+  }
+
   void _showFilterBottomSheet() {
     showModalBottomSheet(
       context: context,
@@ -266,6 +351,10 @@ class _ProviderSelectionPageState extends State<ProviderSelectionPage> {
         maxPrice: _maxPrice,
         maxDistance: _maxDistance,
         availableOnly: _availableOnly,
+        selectedKifleKetema: _selectedKifleKetema,
+        selectedWoreda: _selectedWoreda,
+        selectedDate: _selectedDate,
+        selectedTimeSlots: _selectedTimeSlots,
         onApplyFilters: (filters) {
           setState(() {
             _selectedProviders = filters['providers'] ?? [];
@@ -274,6 +363,10 @@ class _ProviderSelectionPageState extends State<ProviderSelectionPage> {
             _maxPrice = filters['maxPrice'] ?? 50.0;
             _maxDistance = filters['maxDistance'] ?? 30.0;
             _availableOnly = filters['availableOnly'] ?? true;
+            _selectedKifleKetema = filters['kifleKetema'];
+            _selectedWoreda = filters['woreda'];
+            _selectedDate = filters['date'];
+            _selectedTimeSlots = List<String>.from(filters['timeSlots'] ?? []);
             _activeFilterCount = _calculateActiveFilters();
           });
         },
@@ -281,12 +374,52 @@ class _ProviderSelectionPageState extends State<ProviderSelectionPage> {
     );
   }
 
+  void _removeLocationFilter() {
+    setState(() {
+      _selectedKifleKetema = null;
+      _selectedWoreda = null;
+      _activeFilterCount = _calculateActiveFilters();
+    });
+  }
+  
+  void _removePriceFilter() {
+    setState(() {
+      _minPrice = 10.0;
+      _maxPrice = 50.0;
+      _activeFilterCount = _calculateActiveFilters();
+    });
+  }
+  
+  void _removeRatingFilter() {
+    setState(() {
+      _selectedRatings = [];
+      _activeFilterCount = _calculateActiveFilters();
+    });
+  }
+  
+  void _removeDateFilter() {
+    setState(() {
+      _selectedDate = null;
+      _activeFilterCount = _calculateActiveFilters();
+    });
+  }
+  
+  void _removeTimeSlotsFilter() {
+    setState(() {
+      _selectedTimeSlots = [];
+      _activeFilterCount = _calculateActiveFilters();
+    });
+  }
+
   int _calculateActiveFilters() {
     int count = 0;
+    if (_selectedKifleKetema != null && _selectedWoreda != null) count++;
     if (_selectedProviders.isNotEmpty) count++;
     if (_selectedRatings.isNotEmpty) count++;
     if (_minPrice > 10.0 || _maxPrice < 50.0) count++;
     if (_maxDistance < 30.0) count++;
+    if (_selectedDate != null) count++;
+    if (_selectedTimeSlots.isNotEmpty) count++;
     if (!_availableOnly) count++;
     return count;
   }

@@ -63,10 +63,6 @@ class _TaskPostingPageState extends State<TaskPostingPage> {
         centerTitle: true,
         actions: [
           IconButton(
-            icon: const Icon(Icons.search, color: AppTheme.textPrimaryColor),
-            onPressed: () {},
-          ),
-          IconButton(
             icon: const Icon(Icons.notifications_none, color: AppTheme.textPrimaryColor),
             onPressed: () {},
           ),

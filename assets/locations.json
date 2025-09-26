@@ -1,0 +1,84 @@
+{
+  "kifle_ketema": {
+    "Bole": [
+      "Bole Sub City",
+      "Bole Airport Area",
+      "Bole Bulbula",
+      "Bole Medhanialem",
+      "Bole Michael",
+      "Bole Rwanda"
+    ],
+    "Addis Ketema": [
+      "Addis Ketema Sub City",
+      "Addis Ketema Central",
+      "Addis Ketema North",
+      "Addis Ketema South",
+      "Addis Ketema East",
+      "Addis Ketema West"
+    ],
+    "Akaki Kaliti": [
+      "Akaki Kaliti Sub City",
+      "Akaki Kaliti Central",
+      "Akaki Kaliti North",
+      "Akaki Kaliti South",
+      "Akaki Kaliti East",
+      "Akaki Kaliti West"
+    ],
+    "Arada": [
+      "Arada Sub City",
+      "Arada Central",
+      "Arada North",
+      "Arada South",
+      "Arada East",
+      "Arada West"
+    ],
+    "Gullele": [
+      "Gullele Sub City",
+      "Gullele Central",
+      "Gullele North",
+      "Gullele South",
+      "Gullele East",
+      "Gullele West"
+    ],
+    "Kirkos": [
+      "Kirkos Sub City",
+      "Kirkos Central",
+      "Kirkos North",
+      "Kirkos South",
+      "Kirkos East",
+      "Kirkos West"
+    ],
+    "Kolfe Keranio": [
+      "Kolfe Keranio Sub City",
+      "Kolfe Keranio Central",
+      "Kolfe Keranio North",
+      "Kolfe Keranio South",
+      "Kolfe Keranio East",
+      "Kolfe Keranio West"
+    ],
+    "Lideta": [
+      "Lideta Sub City",
+      "Lideta Central",
+      "Lideta North",
+      "Lideta South",
+      "Lideta East",
+      "Lideta West"
+    ],
+    "Nifas Silk Lafto": [
+      "Nifas Silk Lafto Sub City",
+      "Nifas Silk Lafto Central",
+      "Nifas Silk Lafto North",
+      "Nifas Silk Lafto South",
+      "Nifas Silk Lafto East",
+      "Nifas Silk Lafto West"
+    ],
+    "Yeka": [
+      "Yeka Sub City",
+      "Yeka Central",
+      "Yeka North",
+      "Yeka South",
+      "Yeka East",
+      "Yeka West"
+    ]
+  }
+}

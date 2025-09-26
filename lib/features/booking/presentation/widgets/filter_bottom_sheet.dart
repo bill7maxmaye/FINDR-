@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'dart:convert';
 import '../../../../core/theme.dart';
+import 'nested_location_dropdown.dart';
 
 class FilterBottomSheet extends StatefulWidget {
   final int activeFilterCount;
@@ -9,6 +12,10 @@ class FilterBottomSheet extends StatefulWidget {
   final double maxPrice;
   final double maxDistance;
   final bool availableOnly;
+  final String? selectedKifleKetema;
+  final String? selectedWoreda;
+  final DateTime? selectedDate;
+  final List<String> selectedTimeSlots;
   final Function(Map<String, dynamic>) onApplyFilters;
 
   const FilterBottomSheet({
@@ -20,6 +27,10 @@ class FilterBottomSheet extends StatefulWidget {
     required this.maxPrice,
     required this.maxDistance,
     required this.availableOnly,
+    this.selectedKifleKetema,
+    this.selectedWoreda,
+    this.selectedDate,
+    this.selectedTimeSlots = const [],
     required this.onApplyFilters,
   });
 
@@ -36,6 +47,10 @@ class _FilterBottomSheetState extends State<FilterBottomSheet>
   late double _maxPrice;
   late double _maxDistance;
   late bool _availableOnly;
+  late String? _selectedKifleKetema;
+  late String? _selectedWoreda;
+  late DateTime? _selectedDate;
+  late List<String> _selectedTimeSlots;
 
   final List<Map<String, dynamic>> _providers = [
     {'id': '1', 'name': 'Templeton Peck', 'served': 105, 'experience': 8, 'selected': true},
@@ -44,6 +59,10 @@ class _FilterBottomSheetState extends State<FilterBottomSheet>
     {'id': '4', 'name': 'Rhonda Rhodes', 'served': 30, 'experience': 5, 'selected': false},
     {'id': '5', 'name': 'Ricky Smith', 'served': 50, 'experience': 4.5, 'selected': false},
   ];
+
+  // Location data
+  List<String> _availableWoredas = [];
+  Map<String, List<String>> _kifleKetemaData = {};
 
   @override
   void initState() {
@@ -55,6 +74,25 @@ class _FilterBottomSheetState extends State<FilterBottomSheet>
     _maxPrice = widget.maxPrice;
     _maxDistance = widget.maxDistance;
     _availableOnly = widget.availableOnly;
+    _selectedKifleKetema = widget.selectedKifleKetema;
+    _selectedWoreda = widget.selectedWoreda;
+    _selectedDate = widget.selectedDate;
+    _selectedTimeSlots = List.from(widget.selectedTimeSlots);
+    _loadLocationData();
+  }
+
+  Future<void> _loadLocationData() async {
+    try {
+      final String response = await rootBundle.loadString('assets/locations.json');
+      final Map<String, dynamic> data = json.decode(response);
+      setState(() {
+        _kifleKetemaData = Map<String, List<String>>.from(
+          data['kifle_ketema'].map((key, value) => MapEntry(key, List<String>.from(value)))
+        );
+      });
+    } catch (e) {
+      print('Error loading location data: $e');
+    }
   }
 
   @override
@@ -109,9 +147,9 @@ class _FilterBottomSheetState extends State<FilterBottomSheet>
               unselectedLabelColor: AppTheme.textSecondaryColor,
               indicatorColor: AppTheme.primaryColor,
               tabs: const [
-                Tab(text: 'Provider'),
+                Tab(text: 'Location'),
                 Tab(text: 'Price & rating'),
-                Tab(text: 'Distance'),
+                Tab(text: 'Date & Time'),
               ],
             ),
           ),
@@ -121,9 +159,9 @@ class _FilterBottomSheetState extends State<FilterBottomSheet>
             child: TabBarView(
               controller: _tabController,
               children: [
-                _buildProviderTab(),
+                _buildLocationTab(),
                 _buildPriceRatingTab(),
-                _buildDistanceTab(),
+                _buildDateTimeTab(),
               ],
             ),
           ),
@@ -180,99 +218,32 @@ class _FilterBottomSheetState extends State<FilterBottomSheet>
     );
   }
 
-  Widget _buildProviderTab() {
+  Widget _buildLocationTab() {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Available Provider Only Toggle
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  'AVAILABLE PROVIDER ONLY',
-                  style: AppTextStyles.bodyMedium.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: AppTheme.textPrimaryColor,
-                  ),
-                ),
-              ),
-              Switch(
-                value: _availableOnly,
-                onChanged: (value) {
-                  setState(() {
-                    _availableOnly = value;
-                  });
-                },
-                activeColor: AppTheme.primaryColor,
-              ),
-            ],
-          ),
-          
-          const SizedBox(height: 24),
-          
-          // Provider List Header
+          // Location Section
           Text(
-            'Provider list (${_providers.length})',
+            'Service Location',
             style: AppTextStyles.heading3.copyWith(
               color: AppTheme.textPrimaryColor,
             ),
           ),
-          
           const SizedBox(height: 16),
           
-          // Search Bar
-          Container(
-            decoration: BoxDecoration(
-              color: Colors.grey[100],
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: AppTheme.borderColor),
-            ),
-            child: TextField(
-              decoration: InputDecoration(
-                hintText: 'Search here',
-                hintStyle: AppTextStyles.bodyMedium.copyWith(
-                  color: AppTheme.textSecondaryColor,
-                ),
-                prefixIcon: const Icon(
-                  Icons.search,
-                  color: AppTheme.textSecondaryColor,
-                ),
-                border: InputBorder.none,
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              ),
-            ),
+          // Nested Location Dropdown
+          NestedLocationDropdown(
+            selectedKifleKetema: _selectedKifleKetema,
+            selectedWoreda: _selectedWoreda,
+            onLocationChanged: (kifleKetema, woreda) {
+              setState(() {
+                _selectedKifleKetema = kifleKetema;
+                _selectedWoreda = woreda;
+              });
+            },
           ),
-          
-          const SizedBox(height: 16),
-          
-          // Experience Dropdown
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            decoration: BoxDecoration(
-              border: Border.all(color: AppTheme.borderColor),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Row(
-              children: [
-                const Icon(Icons.keyboard_arrow_down, color: AppTheme.textSecondaryColor),
-                const SizedBox(width: 8),
-                Text(
-                  'Highest experience',
-                  style: AppTextStyles.bodyMedium.copyWith(
-                    color: AppTheme.textPrimaryColor,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          
-          const SizedBox(height: 16),
-          
-          // Provider List
-          ..._providers.map((provider) => _buildProviderItem(provider)).toList(),
         ],
       ),
     );
@@ -427,80 +398,158 @@ class _FilterBottomSheetState extends State<FilterBottomSheet>
     );
   }
 
-  Widget _buildDistanceTab() {
+  Widget _buildDateTimeTab() {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Near by location toggle
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  'Near by location',
-                  style: AppTextStyles.bodyMedium.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: AppTheme.textPrimaryColor,
-                  ),
-                ),
-              ),
-              Switch(
-                value: false, // This would be controlled by state
-                onChanged: (value) {
-                  // Handle toggle
-                },
-                activeColor: AppTheme.primaryColor,
-              ),
-            ],
-          ),
-          
-          const SizedBox(height: 24),
-          
-          // Distance
+          // Date Section
           Text(
-            'Distance location',
+            'Date',
             style: AppTextStyles.heading3.copyWith(
               color: AppTheme.textPrimaryColor,
             ),
           ),
           const SizedBox(height: 16),
           
-          // Distance Slider
-          Slider(
-            value: _maxDistance,
-            min: 10,
-            max: 60,
-            divisions: 10,
-            activeColor: AppTheme.primaryColor,
-            onChanged: (value) {
-              setState(() {
-                _maxDistance = value;
-              });
-            },
+          // Date Selection Buttons
+          Row(
+            children: [
+              Expanded(
+                child: _buildDateButton('Today', _selectedDate != null),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildDateButton('Choose Dates', _selectedDate == null),
+              ),
+            ],
           ),
           
-          // Distance markers
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [10, 20, 30, 40, 50, 60].map((distance) {
-              return Column(
-                children: [
-                  Container(
-                    width: 2,
-                    height: 8,
-                    color: _maxDistance >= distance ? AppTheme.primaryColor : AppTheme.borderColor,
+          const SizedBox(height: 32),
+          
+          // Time of day Section
+          Text(
+            'Time of day',
+            style: AppTextStyles.heading3.copyWith(
+              color: AppTheme.textPrimaryColor,
+            ),
+          ),
+          const SizedBox(height: 16),
+          
+          // Time Slot Checkboxes
+          _buildTimeSlotCheckbox('Morning (8am - 12pm)', 'morning'),
+          _buildTimeSlotCheckbox('Afternoon (12pm - 5pm)', 'afternoon'),
+          _buildTimeSlotCheckbox('Evening (5pm - 9:30pm)', 'evening'),
+          
+          const SizedBox(height: 24),
+          
+          // Specific Time Option
+          Text(
+            'or choose a specific time',
+            style: AppTextStyles.bodyMedium.copyWith(
+              color: AppTheme.textSecondaryColor,
+            ),
+          ),
+          const SizedBox(height: 12),
+          
+          // Specific Time Dropdown
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              border: Border.all(color: AppTheme.borderColor),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.access_time,
+                  color: AppTheme.primaryColor,
+                  size: 20,
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  'Specific Time',
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    color: AppTheme.textPrimaryColor,
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '${distance}km',
-                    style: AppTextStyles.bodySmall.copyWith(
-                      color: _maxDistance >= distance ? AppTheme.primaryColor : AppTheme.textSecondaryColor,
-                    ),
-                  ),
-                ],
-              );
-            }).toList(),
+                ),
+                const Spacer(),
+                Icon(
+                  Icons.keyboard_arrow_down,
+                  color: AppTheme.textSecondaryColor,
+                  size: 20,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDateButton(String text, bool isSelected) {
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          if (text == 'Today') {
+            _selectedDate = DateTime.now();
+          } else {
+            _selectedDate = null;
+          }
+        });
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        decoration: BoxDecoration(
+          color: isSelected ? AppTheme.primaryColor : Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isSelected ? AppTheme.primaryColor : AppTheme.borderColor,
+          ),
+        ),
+        child: Text(
+          text,
+          textAlign: TextAlign.center,
+          style: AppTextStyles.bodyMedium.copyWith(
+            color: isSelected ? Colors.white : AppTheme.textPrimaryColor,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTimeSlotCheckbox(String label, String value) {
+    final isSelected = _selectedTimeSlots.contains(value);
+    
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      child: Row(
+        children: [
+          Checkbox(
+            value: isSelected,
+            onChanged: (bool? checked) {
+              setState(() {
+                if (checked == true) {
+                  _selectedTimeSlots.add(value);
+                } else {
+                  _selectedTimeSlots.remove(value);
+                }
+              });
+            },
+            activeColor: AppTheme.primaryColor,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(4),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Text(
+            label,
+            style: AppTextStyles.bodyMedium.copyWith(
+              color: AppTheme.textPrimaryColor,
+            ),
           ),
         ],
       ),
@@ -531,6 +580,10 @@ class _FilterBottomSheetState extends State<FilterBottomSheet>
       'maxPrice': _maxPrice,
       'maxDistance': _maxDistance,
       'availableOnly': _availableOnly,
+      'kifleKetema': _selectedKifleKetema,
+      'woreda': _selectedWoreda,
+      'date': _selectedDate,
+      'timeSlots': _selectedTimeSlots,
     };
     
     widget.onApplyFilters(filters);

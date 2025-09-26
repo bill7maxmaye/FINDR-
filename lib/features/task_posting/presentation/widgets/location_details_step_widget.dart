@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+import 'dart:convert';
 import '../../../../core/theme.dart';
+import '../../../booking/presentation/widgets/nested_location_dropdown.dart';
 
-class LocationDetailsStepWidget extends StatelessWidget {
+class LocationDetailsStepWidget extends StatefulWidget {
   final String location;
   final String title;
   final String summary;
@@ -28,6 +31,45 @@ class LocationDetailsStepWidget extends StatelessWidget {
   });
 
   @override
+  State<LocationDetailsStepWidget> createState() => _LocationDetailsStepWidgetState();
+}
+
+class _LocationDetailsStepWidgetState extends State<LocationDetailsStepWidget> {
+  Map<String, List<String>> _kifleKetemaData = {};
+  String? _selectedKifleKetema;
+  String? _selectedWoreda;
+  List<String> _availableWoredas = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadLocationData();
+  }
+
+  Future<void> _loadLocationData() async {
+    try {
+      final String response = await rootBundle.loadString('assets/locations.json');
+      final Map<String, dynamic> data = json.decode(response);
+      setState(() {
+        _kifleKetemaData = Map<String, List<String>>.from(
+          data['kifle_ketema'].map((key, value) => MapEntry(key, List<String>.from(value)))
+        );
+      });
+    } catch (e) {
+      print('Error loading location data: $e');
+    }
+  }
+
+  void _updateLocation() {
+    if (_selectedKifleKetema != null && _selectedWoreda != null) {
+      final location = '$_selectedWoreda, $_selectedKifleKetema';
+      widget.onLocationChanged(location);
+    }
+  }
+
+
+
+  @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -42,63 +84,35 @@ class LocationDetailsStepWidget extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 8),
-          TextFormField(
-            initialValue: location,
-            onChanged: onLocationChanged,
-            decoration: InputDecoration(
-              hintText: 'Enter the service location',
-              hintStyle: AppTextStyles.bodyMedium.copyWith(
-                color: AppTheme.textSecondaryColor,
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: const BorderSide(color: AppTheme.borderColor),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: const BorderSide(color: AppTheme.borderColor),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: const BorderSide(color: AppTheme.primaryColor, width: 2),
-              ),
-              contentPadding: const EdgeInsets.all(16),
-              prefixIcon: const Icon(Icons.location_on_outlined),
-            ),
+          
+          // Nested Location Dropdown
+          NestedLocationDropdown(
+            selectedKifleKetema: _selectedKifleKetema,
+            selectedWoreda: _selectedWoreda,
+            onLocationChanged: (kifleKetema, woreda) {
+              setState(() {
+                _selectedKifleKetema = kifleKetema;
+                _selectedWoreda = woreda;
+                _availableWoredas = kifleKetema != null ? _kifleKetemaData[kifleKetema] ?? [] : [];
+              });
+              _updateLocation();
+            },
           ),
           
-          const SizedBox(height: 16),
-          
-          // Use Current Location Button
-          SizedBox(
-            width: double.infinity,
-            child: OutlinedButton.icon(
-              onPressed: () {
-                // TODO: Implement current location functionality
-              },
-              icon: const Icon(Icons.my_location),
-              label: const Text('Use Current Location'),
-              style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                side: const BorderSide(color: AppTheme.primaryColor),
-                foregroundColor: AppTheme.primaryColor,
-              ),
-            ),
-          ),
           
           const SizedBox(height: 32),
           
           // Task Title Section
           Text(
             'Task Title',
-            style: AppTextStyles.heading3.copyWith(
+            style: AppTextStyles.bodyMedium.copyWith(
               color: AppTheme.textPrimaryColor,
             ),
           ),
           const SizedBox(height: 8),
           TextFormField(
-            initialValue: title,
-            onChanged: onTitleChanged,
+            initialValue: widget.title,
+            onChanged: widget.onTitleChanged,
             decoration: InputDecoration(
               hintText: 'Enter a clear, descriptive title for your task',
               hintStyle: AppTextStyles.bodyMedium.copyWith(
@@ -124,14 +138,14 @@ class LocationDetailsStepWidget extends StatelessWidget {
           // Task Summary Section
           Text(
             'Task Summary',
-            style: AppTextStyles.heading3.copyWith(
+            style: AppTextStyles.bodyMedium.copyWith(
               color: AppTheme.textPrimaryColor,
             ),
           ),
           const SizedBox(height: 8),
           TextFormField(
-            initialValue: summary,
-            onChanged: onSummaryChanged,
+            initialValue: widget.summary,
+            onChanged: widget.onSummaryChanged,
             maxLines: 4,
             decoration: InputDecoration(
               hintText: 'Describe your task in detail. What needs to be done?',
@@ -158,7 +172,7 @@ class LocationDetailsStepWidget extends StatelessWidget {
           // Image Upload Section
           Text(
             'Add Images (Optional)',
-            style: AppTextStyles.heading3.copyWith(
+            style: AppTextStyles.bodyMedium.copyWith(
               color: AppTheme.textPrimaryColor,
             ),
           ),
@@ -181,12 +195,12 @@ class LocationDetailsStepWidget extends StatelessWidget {
               mainAxisSpacing: 8,
               childAspectRatio: 1,
             ),
-            itemCount: images.length + 1, // +1 for add button
+            itemCount: widget.images.length + 1, // +1 for add button
             itemBuilder: (context, index) {
-              if (index == images.length) {
+              if (index == widget.images.length) {
                 // Add image button
                 return GestureDetector(
-                  onTap: () => _showImageSourceDialog(context),
+                  onTap: () => _showImageSourceDialog(),
                   child: Container(
                     decoration: BoxDecoration(
                       border: Border.all(
@@ -211,7 +225,7 @@ class LocationDetailsStepWidget extends StatelessWidget {
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(8),
                         image: DecorationImage(
-                          image: FileImage(File(images[index])),
+                          image: FileImage(File(widget.images[index])),
                           fit: BoxFit.cover,
                         ),
                       ),
@@ -220,7 +234,7 @@ class LocationDetailsStepWidget extends StatelessWidget {
                       top: 4,
                       right: 4,
                       child: GestureDetector(
-                        onTap: () => onImageRemoved(index),
+                        onTap: () => widget.onImageRemoved(index),
                         child: Container(
                           padding: const EdgeInsets.all(4),
                           decoration: const BoxDecoration(
@@ -245,7 +259,7 @@ class LocationDetailsStepWidget extends StatelessWidget {
     );
   }
 
-  void _showImageSourceDialog(BuildContext context) {
+  void _showImageSourceDialog() {
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
@@ -284,7 +298,7 @@ class LocationDetailsStepWidget extends StatelessWidget {
       imageQuality: 80,
     );
     if (image != null) {
-      onImageAdded(image.path);
+      widget.onImageAdded(image.path);
     }
   }
 }
