@@ -107,7 +107,7 @@ class _ProviderProfileDetailPageState extends State<ProviderProfileDetailPage> {
           const SizedBox(height: 16),
           _buildSkeletonSection('Availability'),
           const SizedBox(height: 16),
-          _buildSkeletonSection('Reviews'),
+          _buildSkeletonSection('Completed Jobs'),
         ],
       ),
     );
@@ -136,7 +136,7 @@ class _ProviderProfileDetailPageState extends State<ProviderProfileDetailPage> {
                 ),
               ),
             )
-          else if (title == 'Reviews')
+          else if (title == 'Completed Jobs')
             Column(
               children: List.generate(2, (index) => 
                 Padding(
@@ -160,7 +160,6 @@ class _ProviderProfileDetailPageState extends State<ProviderProfileDetailPage> {
           _buildServicesSection(state.provider['services']),
           _buildCertificationsSection(state.certifications),
           _buildAvailabilitySection(state.availability),
-          _buildReviewsSection(state.reviews),
           _buildCompletedJobsSection(state.completedJobs),
           const SizedBox(height: 100), // Space for floating button
         ],
@@ -323,12 +322,16 @@ class _ProviderProfileDetailPageState extends State<ProviderProfileDetailPage> {
             ),
           ),
           const SizedBox(height: 12),
-          Text(
-            provider['description'] ?? 'No description available.',
-            style: const TextStyle(
-              fontSize: 14,
-              color: Colors.black87,
-              height: 1.5,
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              provider['description'] ?? 'No description available.',
+              style: const TextStyle(
+                fontSize: 14,
+                color: Colors.black87,
+                height: 1.5,
+              ),
+              textAlign: TextAlign.left,
             ),
           ),
         ],
@@ -351,10 +354,14 @@ class _ProviderProfileDetailPageState extends State<ProviderProfileDetailPage> {
             ),
           ),
           const SizedBox(height: 12),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: services.map((service) => _buildServiceChip(service)).toList(),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              alignment: WrapAlignment.start,
+              children: services.map((service) => _buildServiceChip(service)).toList(),
+            ),
           ),
         ],
       ),
@@ -394,10 +401,14 @@ class _ProviderProfileDetailPageState extends State<ProviderProfileDetailPage> {
             ),
           ),
           const SizedBox(height: 12),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: certifications.map((cert) => _buildCertificationChip(cert)).toList(),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              alignment: WrapAlignment.start,
+              children: certifications.map((cert) => _buildCertificationChip(cert)).toList(),
+            ),
           ),
         ],
       ),
@@ -486,120 +497,6 @@ class _ProviderProfileDetailPageState extends State<ProviderProfileDetailPage> {
     );
   }
 
-  Widget _buildReviewsSection(List<Map<String, dynamic>> reviews) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                'Reviews',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
-                ),
-              ),
-              if (reviews.isNotEmpty)
-                GestureDetector(
-                  onTap: () => _openReviewsPage(reviews),
-                  child: Row(
-                    children: [
-                      Text(
-                        'View All (${reviews.length})',
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: AppTheme.primaryColor,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      const SizedBox(width: 4),
-                      const Icon(
-                        Icons.arrow_forward_ios,
-                        size: 12,
-                        color: AppTheme.primaryColor,
-                      ),
-                    ],
-                  ),
-                ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          ...reviews.take(2).map((review) => _buildReviewCard(review)),
-          if (reviews.length > 2)
-            Padding(
-              padding: const EdgeInsets.only(top: 8),
-              child: Center(
-                child: GestureDetector(
-                  onTap: () => _openReviewsPage(reviews),
-                  child: Text(
-                    'View ${reviews.length - 2} more reviews',
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: AppTheme.primaryColor,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildReviewCard(Map<String, dynamic> review) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.grey[50],
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey[200]!),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            '"${review['comment']}"',
-            style: const TextStyle(
-              fontSize: 14,
-              color: Colors.black87,
-              fontStyle: FontStyle.italic,
-            ),
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: List.generate(4, (index) => 
-              Container(
-                margin: EdgeInsets.only(right: index < 3 ? 8 : 0),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: Image.network(
-                    review['projectImages'][index],
-                    width: 60,
-                    height: 60,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        width: 60,
-                        height: 60,
-                        color: Colors.grey[300],
-                        child: const Icon(Icons.image, color: Colors.grey),
-                      );
-                    },
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
   Widget _buildCompletedJobsSection(List<Map<String, dynamic>> completedJobs) {
     return Container(
@@ -641,45 +538,67 @@ class _ProviderProfileDetailPageState extends State<ProviderProfileDetailPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            job['title'],
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: Colors.black87,
-            ),
-          ),
-          const SizedBox(height: 4),
+          // Job Header
           Row(
             children: [
-              Text(
-                '${job['startDate']} - ${job['endDate']}',
-                style: const TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      job['title'],
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '${job['startDate']} - ${job['endDate']}',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(width: 16),
-              Row(
-                children: List.generate(5, (index) => 
-                  Icon(
-                    Icons.star,
-                    size: 16,
-                    color: index < (job['rating'] ?? 0) ? Colors.amber : Colors.grey[300],
-                  ),
+              // Job Rating
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.green[50],
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.green[200]!),
                 ),
-              ),
-              const SizedBox(width: 4),
-              Text(
-                '${job['rating']}',
-                style: const TextStyle(
-                  fontSize: 12,
-                  color: Colors.black87,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    ...List.generate(5, (index) => 
+                      Icon(
+                        Icons.star,
+                        size: 14,
+                        color: index < (job['rating'] ?? 0) ? Colors.amber : Colors.grey[300],
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      '${job['rating']}',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.green[800],
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
+          
+          // Job Description
           Text(
             '"${job['description']}"',
             style: const TextStyle(
@@ -689,30 +608,161 @@ class _ProviderProfileDetailPageState extends State<ProviderProfileDetailPage> {
             ),
           ),
           const SizedBox(height: 12),
-          Row(
-            children: List.generate(4, (index) => 
-              Container(
-                margin: EdgeInsets.only(right: index < 3 ? 8 : 0),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: Image.network(
-                    job['images'][index],
-                    width: 60,
-                    height: 60,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
+          
+          // Job Images
+          if (job['images'] != null && job['images'].isNotEmpty)
+            SizedBox(
+              height: 60,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: job['images'].length,
+                itemBuilder: (context, index) {
+                  return Container(
+                    margin: EdgeInsets.only(right: index < job['images'].length - 1 ? 8 : 0),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Image.network(
+                        job['images'][index],
                         width: 60,
                         height: 60,
-                        color: Colors.grey[300],
-                        child: const Icon(Icons.image, color: Colors.grey),
-                      );
-                    },
-                  ),
-                ),
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            width: 60,
+                            height: 60,
+                            color: Colors.grey[300],
+                            child: const Icon(Icons.image, color: Colors.grey),
+                          );
+                        },
+                      ),
+                    ),
+                  );
+                },
               ),
             ),
-          ),
+          
+          // Client Review Section (Upwork-style)
+          if (job['clientReview'] != null) ...[
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.grey[50],
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.grey[200]!),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Client Info and Rating
+                  Row(
+                    children: [
+                      Container(
+                        width: 32,
+                        height: 32,
+                        decoration: BoxDecoration(
+                          color: Colors.grey[200],
+                          shape: BoxShape.circle,
+                        ),
+                        child: Center(
+                          child: Text(
+                            job['clientReview']['clientName'][0].toUpperCase(),
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              job['clientReview']['clientName'],
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.black87,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Row(
+                              children: [
+                                ...List.generate(5, (index) => 
+                                  Icon(
+                                    Icons.star,
+                                    size: 12,
+                                    color: index < (job['clientReview']['rating'] ?? 0) ? Colors.amber : Colors.grey[300],
+                                  ),
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  job['clientReview']['date'],
+                                  style: const TextStyle(
+                                    fontSize: 10,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  
+                  // Client Review Comment
+                  Text(
+                    '"${job['clientReview']['comment']}"',
+                    style: const TextStyle(
+                      fontSize: 13,
+                      color: Colors.black87,
+                      fontStyle: FontStyle.italic,
+                      height: 1.3,
+                    ),
+                  ),
+                  
+                  // Project Images from Review
+                  if (job['clientReview']['projectImages'] != null && job['clientReview']['projectImages'].isNotEmpty) ...[
+                    const SizedBox(height: 8),
+                    SizedBox(
+                      height: 50,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: job['clientReview']['projectImages'].length,
+                        itemBuilder: (context, index) {
+                          return Container(
+                            margin: EdgeInsets.only(right: index < job['clientReview']['projectImages'].length - 1 ? 6 : 0),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(6),
+                              child: Image.network(
+                                job['clientReview']['projectImages'][index],
+                                width: 50,
+                                height: 50,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Container(
+                                    width: 50,
+                                    height: 50,
+                                    color: Colors.grey[300],
+                                    child: const Icon(Icons.image, color: Colors.grey, size: 16),
+                                  );
+                                },
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ],
         ],
       ),
     );
@@ -823,190 +873,5 @@ class _ProviderProfileDetailPageState extends State<ProviderProfileDetailPage> {
     Navigator.of(context).pop();
   }
 
-  void _openReviewsPage(List<Map<String, dynamic>> reviews) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => _buildReviewsBottomSheet(reviews),
-    );
-  }
-
-  Widget _buildReviewsBottomSheet(List<Map<String, dynamic>> reviews) {
-    return Container(
-      height: MediaQuery.of(context).size.height * 0.8,
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(20),
-          topRight: Radius.circular(20),
-        ),
-      ),
-      child: Column(
-        children: [
-          // Handle bar
-          Container(
-            margin: const EdgeInsets.only(top: 12),
-            width: 40,
-            height: 4,
-            decoration: BoxDecoration(
-              color: Colors.grey[300],
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-          // Header
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'All Reviews',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
-                  ),
-                ),
-                IconButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  icon: const Icon(Icons.close),
-                ),
-              ],
-            ),
-          ),
-          // Reviews list
-          Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              itemCount: reviews.length,
-              itemBuilder: (context, index) {
-                final review = reviews[index];
-                return _buildDetailedReviewCard(review);
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDetailedReviewCard(Map<String, dynamic> review) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.grey[50],
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey[200]!),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Review header
-          Row(
-            children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: Colors.grey[200],
-                  shape: BoxShape.circle,
-                ),
-                child: Center(
-                  child: Text(
-                    review['clientName'][0].toUpperCase(),
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      review['clientName'],
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Row(
-                      children: [
-                        ...List.generate(5, (index) => 
-                          Icon(
-                            Icons.star,
-                            size: 16,
-                            color: index < (review['rating'] ?? 0) ? Colors.amber : Colors.grey[300],
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          review['date'],
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          // Review text
-          Text(
-            '"${review['comment']}"',
-            style: const TextStyle(
-              fontSize: 14,
-              color: Colors.black87,
-              fontStyle: FontStyle.italic,
-              height: 1.4,
-            ),
-          ),
-          const SizedBox(height: 12),
-          // Project images
-          if (review['projectImages'] != null && review['projectImages'].isNotEmpty)
-            SizedBox(
-              height: 80,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: review['projectImages'].length,
-                itemBuilder: (context, index) {
-                  return Container(
-                    margin: EdgeInsets.only(right: index < review['projectImages'].length - 1 ? 8 : 0),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: Image.network(
-                        review['projectImages'][index],
-                        width: 80,
-                        height: 80,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Container(
-                            width: 80,
-                            height: 80,
-                            color: Colors.grey[300],
-                            child: const Icon(Icons.image, color: Colors.grey),
-                          );
-                        },
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-        ],
-      ),
-    );
-  }
 }
+

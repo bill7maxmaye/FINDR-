@@ -244,9 +244,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                   TextButton(
                     onPressed: () => context.push('/categories'),
-                    child: const Text(
+                    child: Text(
                       'See All',
-                      style: TextStyle(color: Colors.green),
+                      style: TextStyle(color: AppTheme.primaryColor),
                     ),
                   ),
               ],
@@ -310,8 +310,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     onPressed: () {},
                     style: ElevatedButton.styleFrom(
                       shape: const StadiumBorder(),
-                      backgroundColor: Colors.white,
-                      foregroundColor: Colors.green,
+                      backgroundColor: AppTheme.primaryColor,
+                      foregroundColor: Colors.white,
                     ),
                     child: const Text('Find Now'),
                   ),
