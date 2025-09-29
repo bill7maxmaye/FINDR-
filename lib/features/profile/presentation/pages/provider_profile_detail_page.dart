@@ -6,6 +6,8 @@ import '../bloc/provider_profile_bloc.dart';
 import '../bloc/provider_profile_event.dart';
 import '../bloc/provider_profile_state.dart';
 import '../widgets/skeleton_loading.dart';
+import '../widgets/date_time_picker_modal.dart';
+import '../widgets/task_scheduled_success_dialog.dart';
 
 class ProviderProfileDetailPage extends StatefulWidget {
   final String providerId;
@@ -862,15 +864,47 @@ class _ProviderProfileDetailPageState extends State<ProviderProfileDetailPage> {
   }
 
   void _selectProvider(Map<String, dynamic> provider) {
-    // Handle provider selection - navigate back to provider selection or next step
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Selected ${provider['name']}'),
-        backgroundColor: AppTheme.primaryColor,
+    // Show date/time picker modal
+    showDialog(
+      context: context,
+      builder: (context) => DateTimePickerModal(
+        providerName: provider['name'] ?? 'Provider',
+        providerInitials: _getInitials(provider['name'] ?? 'Provider'),
+        onConfirm: (selectedDate, selectedTime) {
+          _showSuccessDialog(provider, selectedDate, selectedTime);
+        },
       ),
     );
-    // TODO: Navigate to booking confirmation page or back to provider selection
-    Navigator.of(context).pop();
+  }
+
+
+  void _showSuccessDialog(Map<String, dynamic> provider, DateTime selectedDate, String selectedTime) {
+    final taskTitle = 'Task with ${provider['name']}';
+    final scheduledDate = _formatDate(selectedDate);
+    
+    TaskScheduledSuccessDialog.show(
+      context: context,
+      taskTitle: taskTitle,
+      scheduledDate: scheduledDate,
+      scheduledTime: selectedTime,
+      providerName: provider['name'] ?? 'Provider',
+      onViewRequest: () {
+        // Navigate to bookings page or request details
+        context.go('/bookings');
+      },
+      onClose: () {
+        // Navigate back to home or provider selection
+        context.go('/home');
+      },
+    );
+  }
+
+  String _formatDate(DateTime date) {
+    const months = [
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+    ];
+    return '${months[date.month - 1]} ${date.day}';
   }
 
 }

@@ -3,6 +3,8 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme.dart';
 import '../widgets/provider_card.dart';
 import '../widgets/filter_bottom_sheet.dart';
+import '../../../profile/presentation/widgets/date_time_picker_modal.dart';
+import '../../../profile/presentation/widgets/task_scheduled_success_dialog.dart';
 
 class ProviderSelectionPage extends StatefulWidget {
   final String category;
@@ -201,14 +203,75 @@ class _ProviderSelectionPageState extends State<ProviderSelectionPage> {
   }
 
   void _selectProvider(Map<String, dynamic> provider) {
-    // Handle provider selection - navigate to booking confirmation or next step
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Selected ${provider['name']}'),
-        backgroundColor: AppTheme.primaryColor,
+    // Show date/time picker modal
+    showDialog(
+      context: context,
+      builder: (context) => DateTimePickerModal(
+        providerName: provider['name'] ?? 'Provider',
+        providerInitials: _getInitials(provider['name'] ?? 'Provider'),
+        onConfirm: (selectedDate, selectedTime) {
+          _showSuccessDialog(provider, selectedDate, selectedTime);
+        },
       ),
     );
-    // TODO: Navigate to booking confirmation page
+  }
+
+  String _getInitials(String name) {
+    final names = name.split(' ');
+    if (names.length >= 2) {
+      return '${names[0][0]}${names[1][0]}'.toUpperCase();
+    } else if (names.isNotEmpty) {
+      return names[0][0].toUpperCase();
+    }
+    return 'P';
+  }
+
+  void _showSuccessDialog(Map<String, dynamic> provider, DateTime selectedDate, String selectedTime) {
+    print('_showSuccessDialog called!');
+    print('Provider: ${provider['name']}');
+    print('Selected date: $selectedDate');
+    print('Selected time: $selectedTime');
+    
+    final taskTitle = 'Task with ${provider['name']}';
+    final scheduledDate = _formatDate(selectedDate);
+    
+    print('Task title: $taskTitle');
+    print('Scheduled date: $scheduledDate');
+    
+    try {
+      print('About to call TaskScheduledSuccessDialog.show');
+      TaskScheduledSuccessDialog.show(
+        context: context,
+        taskTitle: taskTitle,
+        scheduledDate: scheduledDate,
+        scheduledTime: selectedTime,
+        providerName: provider['name'] ?? 'Provider',
+        onViewRequest: () {
+          print('View request clicked');
+          // Navigate to bookings page or request details
+          context.go('/bookings');
+        },
+        onClose: () {
+          print('Close clicked');
+          // Navigate back to home or provider selection
+          context.go('/home');
+        },
+      );
+      print('TaskScheduledSuccessDialog.show completed successfully');
+    } catch (e) {
+      print('Error calling TaskScheduledSuccessDialog.show: $e');
+    }
+  }
+
+  String _formatDate(DateTime date) {
+    print('_formatDate called with: $date');
+    const months = [
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+    ];
+    final result = '${months[date.month - 1]} ${date.day}';
+    print('_formatDate result: $result');
+    return result;
   }
 
   void _viewProviderProfile(Map<String, dynamic> provider) {
