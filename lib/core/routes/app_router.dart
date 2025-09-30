@@ -189,12 +189,19 @@ class AppRouter {
         path: '/my-requests',
         name: 'my-requests',
         builder: (context, state) => Scaffold(
-          appBar: PreferredSize(
-            preferredSize: const Size.fromHeight(kToolbarHeight),
-            child: AppBar(
-              title: const Text('My Requests'),
-              backgroundColor: AppTheme.primaryColor,
-              foregroundColor: Colors.white,
+          appBar: AppBar(
+            title: const Text('My Requests'),
+            backgroundColor: AppTheme.primaryColor,
+            foregroundColor: Colors.white,
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back, color: Colors.white),
+              onPressed: () {
+                if (Navigator.of(context).canPop()) {
+                  Navigator.of(context).pop();
+                } else {
+                  context.go('/home');
+                }
+              },
             ),
           ),
           body: const Center(
@@ -206,12 +213,19 @@ class AppRouter {
         path: '/my-reviews',
         name: 'my-reviews',
         builder: (context, state) => Scaffold(
-          appBar: PreferredSize(
-            preferredSize: const Size.fromHeight(kToolbarHeight),
-            child: AppBar(
-              title: const Text('My Reviews'),
-              backgroundColor: AppTheme.primaryColor,
-              foregroundColor: Colors.white,
+          appBar: AppBar(
+            title: const Text('My Reviews'),
+            backgroundColor: AppTheme.primaryColor,
+            foregroundColor: Colors.white,
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back, color: Colors.white),
+              onPressed: () {
+                if (Navigator.of(context).canPop()) {
+                  Navigator.of(context).pop();
+                } else {
+                  context.go('/home');
+                }
+              },
             ),
           ),
           body: const Center(
