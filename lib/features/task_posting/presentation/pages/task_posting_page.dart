@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme.dart';
+import '../../../profile/presentation/widgets/profile_dropdown.dart';
 import '../bloc/task_posting_bloc.dart';
 import '../bloc/task_posting_event.dart';
 import '../bloc/task_posting_state.dart';
@@ -73,11 +74,12 @@ class _TaskPostingPageState extends State<TaskPostingPage> {
             icon: const Icon(Icons.notifications_none, color: AppTheme.iconColor),
             onPressed: () {},
           ),
-          const Padding(
-            padding: EdgeInsets.only(right: 16.0),
-            child: CircleAvatar(
-              radius: 16,
-              backgroundImage: AssetImage('assets/images/person.jpg'),
+          Padding(
+            padding: const EdgeInsets.only(right: 16.0),
+            child: ProfileDropdown(
+              userName: 'John Doe', // TODO: Get from user state
+              userEmail: 'john@example.com', // TODO: Get from user state
+              profileImageUrl: 'assets/images/person.jpg',
             ),
           ),
         ],

@@ -8,6 +8,7 @@ import '../../features/auth/presentation/pages/register_page.dart';
 import '../../features/home/presentation/pages/home_page.dart';
 import '../../features/home/presentation/pages/categories_page.dart';
 import '../../features/profile/presentation/pages/profile_page.dart';
+import '../../features/profile/presentation/pages/manage_account_page.dart';
 import '../../features/booking/presentation/pages/bookings_page.dart';
 import '../../features/auth/presentation/pages/forgot_password_page.dart';
 import '../../features/auth/presentation/pages/reset_password_page.dart';
@@ -183,6 +184,45 @@ class AppRouter {
             child: Text('Change Password Page - Coming Soon'),
           ),
         ),
+      ),
+      GoRoute(
+        path: '/my-requests',
+        name: 'my-requests',
+        builder: (context, state) => Scaffold(
+          appBar: PreferredSize(
+            preferredSize: const Size.fromHeight(kToolbarHeight),
+            child: AppBar(
+              title: const Text('My Requests'),
+              backgroundColor: AppTheme.primaryColor,
+              foregroundColor: Colors.white,
+            ),
+          ),
+          body: const Center(
+            child: Text('My Requests Page - Coming Soon'),
+          ),
+        ),
+      ),
+      GoRoute(
+        path: '/my-reviews',
+        name: 'my-reviews',
+        builder: (context, state) => Scaffold(
+          appBar: PreferredSize(
+            preferredSize: const Size.fromHeight(kToolbarHeight),
+            child: AppBar(
+              title: const Text('My Reviews'),
+              backgroundColor: AppTheme.primaryColor,
+              foregroundColor: Colors.white,
+            ),
+          ),
+          body: const Center(
+            child: Text('My Reviews Page - Coming Soon'),
+          ),
+        ),
+      ),
+      GoRoute(
+        path: '/manage-account',
+        name: 'manage-account',
+        builder: (context, state) => const ManageAccountPage(),
       ),
       GoRoute(
         path: '/forgot-password',
