@@ -10,6 +10,7 @@ import '../../features/home/presentation/pages/categories_page.dart';
 import '../../features/profile/presentation/pages/profile_page.dart';
 import '../../features/profile/presentation/pages/manage_account_page.dart';
 import '../../features/booking/presentation/pages/bookings_page.dart';
+import '../../features/booking/presentation/pages/my_requests_page.dart';
 import '../../features/auth/presentation/pages/forgot_password_page.dart';
 import '../../features/auth/presentation/pages/reset_password_page.dart';
 import '../../features/auth/presentation/pages/verify_email_page.dart';
@@ -188,26 +189,7 @@ class AppRouter {
       GoRoute(
         path: '/my-requests',
         name: 'my-requests',
-        builder: (context, state) => Scaffold(
-          appBar: AppBar(
-            title: const Text('My Requests'),
-            backgroundColor: AppTheme.primaryColor,
-            foregroundColor: Colors.white,
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back, color: Colors.white),
-              onPressed: () {
-                if (Navigator.of(context).canPop()) {
-                  Navigator.of(context).pop();
-                } else {
-                  context.go('/home');
-                }
-              },
-            ),
-          ),
-          body: const Center(
-            child: Text('My Requests Page - Coming Soon'),
-          ),
-        ),
+        builder: (context, state) => const MyRequestsPage(),
       ),
       GoRoute(
         path: '/my-reviews',
