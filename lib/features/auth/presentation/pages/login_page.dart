@@ -34,6 +34,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey[50],
       body: BlocListener<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is AuthError) {
@@ -51,26 +52,44 @@ class _LoginPageState extends State<LoginPage> {
         child: SafeArea(
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(24.0),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const SizedBox(height: 40),
-                  const AuthHeader(
-                    title: 'Welcome Back',
-                    subtitle: 'Sign in to your account',
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 480),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).scaffoldBackgroundColor,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [],
                   ),
-                  const SizedBox(height: 40),
-                  AuthTextField(
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Column(
+                          children: [
+                            Image.asset(
+                              'assets/images/findr_logo.png',
+                              height: 72,
+                            ),
+                            const SizedBox(height: 12),
+                            const AuthHeader(
+                              title: 'Welcome Back',
+                              subtitle: 'Sign in to your account',
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 24),
+                        AuthTextField(
                     controller: _emailController,
                     labelText: 'Email',
                     keyboardType: TextInputType.emailAddress,
                     validator: Validators.validateEmail,
                     prefixIcon: Icons.email_outlined,
                   ),
-                  const SizedBox(height: 16),
-                  AuthTextField(
+                        const SizedBox(height: 16),
+                        AuthTextField(
                     controller: _passwordController,
                     labelText: 'Password',
                     obscureText: _obscurePassword,
@@ -87,61 +106,60 @@ class _LoginPageState extends State<LoginPage> {
                       },
                     ),
                   ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Checkbox(
-                        value: _rememberMe,
-                        onChanged: (v) => setState(() => _rememberMe = v ?? true),
-                        activeColor: AppTheme.primaryColor,
-                      ),
-                      Text(
-                        'Remember me',
-                        style: TextStyle(color: AppTheme.primaryColor),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: TextButton(
-                      onPressed: () {
-                        // Navigate to forgot password page
-                        context.go('/forgot-password');
-                      },
-                      style: TextButton.styleFrom(
-                        foregroundColor: AppTheme.primaryColor,
-                      ),
-                      child: const Text('Forgot Password?'),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            Checkbox(
+                              value: _rememberMe,
+                              onChanged: (v) => setState(() => _rememberMe = v ?? true),
+                              activeColor: AppTheme.primaryColor,
+                            ),
+                            Text(
+                              'Remember me',
+                              style: TextStyle(color: AppTheme.primaryColor),
+                            ),
+                            const Spacer(),
+                            TextButton(
+                              onPressed: () {
+                                context.go('/forgot-password');
+                              },
+                              style: TextButton.styleFrom(
+                                foregroundColor: AppTheme.primaryColor,
+                              ),
+                              child: const Text('Forgot Password?'),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        BlocBuilder<AuthBloc, AuthState>(
+                          builder: (context, state) {
+                            return AuthButton(
+                              text: 'Sign In',
+                              isLoading: state is AuthLoading,
+                              onPressed: _handleLogin,
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Text("Don't have an account? "),
+                            TextButton(
+                              onPressed: () {
+                                context.go('/register');
+                              },
+                              style: TextButton.styleFrom(
+                                foregroundColor: AppTheme.primaryColor,
+                              ),
+                              child: const Text('Sign Up'),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 24),
-                  BlocBuilder<AuthBloc, AuthState>(
-                    builder: (context, state) {
-                      return AuthButton(
-                        text: 'Sign In',
-                        isLoading: state is AuthLoading,
-                        onPressed: _handleLogin,
-                      );
-                    },
-                  ),
-                  const SizedBox(height: 24),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text("Don't have an account? "),
-                      TextButton(
-                        onPressed: () {
-                          context.go('/register');
-                        },
-                        style: TextButton.styleFrom(
-                          foregroundColor: AppTheme.primaryColor,
-                        ),
-                        child: const Text('Sign Up'),
-                      ),
-                    ],
-                  ),
-                ],
+                ),
               ),
             ),
           ),
