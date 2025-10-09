@@ -14,12 +14,16 @@ import 'features/task_posting/presentation/bloc/task_posting_bloc.dart';
 import 'features/task_posting/data/datasources/task_api.dart';
 import 'features/task_posting/data/repositories/task_repository_impl.dart';
 import 'features/task_posting/domain/usecases/create_task.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   final storageService = StorageService();
   await storageService.initialize();
+
+  // Load environment variables
+  await dotenv.load(fileName: '.env');
 
   runApp(const ServiceBookingApp());
 }

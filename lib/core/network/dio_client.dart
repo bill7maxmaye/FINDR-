@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class DioClient {
   DioClient._();
@@ -12,8 +13,14 @@ class DioClient {
   Dio? _dio;
   PersistCookieJar? _cookieJar;
 
-  // Backend base URL (Render)
-  static const String baseUrl = 'https://finder-backend-latest.onrender.com/api/auth';
+  // Backend base URL loaded from .env. Must be like: https://finder-backend-latest.onrender.com
+  static String get baseUrl {
+    final value = dotenv.env['baseUrl'];
+    if (value == null || value.isEmpty) {
+      throw StateError('Missing baseUrl in .env');
+    }
+    return value;
+  }
 
   Future<Dio> get instance async {
     if (_dio != null) return _dio!;

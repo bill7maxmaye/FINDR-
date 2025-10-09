@@ -42,11 +42,13 @@ class AuthTextField extends StatelessWidget {
       readOnly: readOnly,
       maxLines: maxLines,
       maxLength: maxLength,
+      cursorColor: AppTheme.primaryColor,
       decoration: InputDecoration(
         labelText: labelText,
         hintText: hintText,
         prefixIcon: prefixIcon != null ? Icon(prefixIcon) : null,
         suffixIcon: suffixIcon,
+        floatingLabelStyle: const TextStyle(color: AppTheme.primaryColor),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
         ),

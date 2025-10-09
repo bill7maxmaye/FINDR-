@@ -22,7 +22,7 @@ class AuthApiImpl implements AuthApi {
   Future<Map<String, dynamic>> login(String email, String password, {bool rememberMe = false}) async {
     try {
       final dio = await _client.instance;
-      final res = await dio.post('/sign-in/email', data: {
+      final res = await dio.post('/api/auth/sign-in/email', data: {
         'email': email,
         'password': password,
         'callbackURL': '',
@@ -50,7 +50,7 @@ class AuthApiImpl implements AuthApi {
         'callbackURL': '',
         'rememberMe': rememberMe,
       };
-      final res = await dio.post('/sign-up/email', data: payload);
+      final res = await dio.post('/api/auth/sign-up/email', data: payload);
       print('Registration payload: $payload');
       print('Registration response: ${res.data}');
 
@@ -67,7 +67,7 @@ class AuthApiImpl implements AuthApi {
   Future<void> logout() async {
     try {
       final dio = await _client.instance;
-      await dio.post('/sign-out', data: {});
+      await dio.post('/api/auth/sign-out', data: {});
     } on DioException catch (e) {
       throw Exception('Logout failed: ${e.response?.data ?? e.message}');
     }
@@ -77,7 +77,7 @@ class AuthApiImpl implements AuthApi {
   Future<Map<String, dynamic>?> getSession() async {
     try {
       final dio = await _client.instance;
-      final res = await dio.get('/get-session');
+      final res = await dio.get('/api/auth/get-session');
 
       if (res.statusCode == 200 && res.data is Map<String, dynamic>) {
         return res.data as Map<String, dynamic>;
@@ -93,7 +93,7 @@ class AuthApiImpl implements AuthApi {
   Future<void> forgotPassword(String email) async {
     try {
       final dio = await _client.instance;
-      await dio.post('/forget-password', data: {
+      await dio.post('/api/auth/forget-password', data: {
         'email': email,
       });
     } on DioException catch (e) {
@@ -105,7 +105,7 @@ class AuthApiImpl implements AuthApi {
   Future<void> resetPassword(String token, String newPassword) async {
     try {
       final dio = await _client.instance;
-      await dio.post('/reset-password', data: {
+      await dio.post('/api/auth/reset-password', data: {
         'newPassword': newPassword,
         'token': token,
       });
@@ -118,7 +118,7 @@ class AuthApiImpl implements AuthApi {
   Future<void> verifyEmail(String token) async {
     try {
       final dio = await _client.instance;
-      await dio.get('/verify-email', queryParameters: {
+      await dio.get('/api/auth/verify-email', queryParameters: {
         'token': token,
       });
     } on DioException catch (e) {
@@ -130,7 +130,7 @@ class AuthApiImpl implements AuthApi {
   Future<void> resendVerificationEmail() async {
     try {
       final dio = await _client.instance;
-      await dio.post('/send-verification-email', data: {});
+      await dio.post('/api/auth/send-verification-email', data: {});
     } on DioException catch (e) {
       throw Exception('Resend verification email failed: ${e.response?.data ?? e.message}');
     }
