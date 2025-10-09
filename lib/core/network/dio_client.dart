@@ -12,8 +12,8 @@ class DioClient {
   Dio? _dio;
   PersistCookieJar? _cookieJar;
 
-  // Replace with a device-reachable URL (LAN/tunnel) when testing on a real device
-  static const String baseUrl = 'http://192.168.1.7:3000/api/auth';
+  // Backend base URL (Render)
+  static const String baseUrl = 'https://finder-backend-latest.onrender.com/api/auth';
 
   Future<Dio> get instance async {
     if (_dio != null) return _dio!;

@@ -51,6 +51,8 @@ class AuthApiImpl implements AuthApi {
         'rememberMe': rememberMe,
       };
       final res = await dio.post('/sign-up/email', data: payload);
+      print('Registration payload: $payload');
+      print('Registration response: ${res.data}');
 
       if (res.statusCode == 200 && res.data is Map<String, dynamic>) {
         return res.data as Map<String, dynamic>;

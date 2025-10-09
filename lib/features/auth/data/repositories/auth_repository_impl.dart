@@ -45,7 +45,13 @@ class AuthRepositoryImpl implements AuthRepository {
     bool rememberMe = true,
   }) async {
     try {
+      print('Registering user with email: $email');
+      print('Name: $name');
+      print('Remember Me: $rememberMe');
       final response = await _authApi.register(name, email, password, rememberMe: rememberMe);
+
+      print('Registration response: $response');
+
       final userData = response['user'] as Map<String, dynamic>;
       final userModel = UserModel.fromJson({
         'id': userData['id'],
@@ -61,6 +67,7 @@ class AuthRepositoryImpl implements AuthRepository {
       
       // Save user profile locally. Session is cookie-based.
       await _storageService.setJson(AppConstants.userKey, userModel.toJson());
+
       
       return user;
     } catch (e) {

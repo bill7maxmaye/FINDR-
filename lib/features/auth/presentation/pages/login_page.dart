@@ -93,8 +93,12 @@ class _LoginPageState extends State<LoginPage> {
                       Checkbox(
                         value: _rememberMe,
                         onChanged: (v) => setState(() => _rememberMe = v ?? true),
+                        activeColor: AppTheme.primaryColor,
                       ),
-                      const Text('Remember me'),
+                      Text(
+                        'Remember me',
+                        style: TextStyle(color: AppTheme.primaryColor),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 8),
@@ -105,6 +109,9 @@ class _LoginPageState extends State<LoginPage> {
                         // Navigate to forgot password page
                         context.go('/forgot-password');
                       },
+                      style: TextButton.styleFrom(
+                        foregroundColor: AppTheme.primaryColor,
+                      ),
                       child: const Text('Forgot Password?'),
                     ),
                   ),
@@ -127,6 +134,9 @@ class _LoginPageState extends State<LoginPage> {
                         onPressed: () {
                           context.go('/register');
                         },
+                        style: TextButton.styleFrom(
+                          foregroundColor: AppTheme.primaryColor,
+                        ),
                         child: const Text('Sign Up'),
                       ),
                     ],

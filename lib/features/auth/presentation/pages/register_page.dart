@@ -132,8 +132,12 @@ class _RegisterPageState extends State<RegisterPage> {
                       Checkbox(
                         value: _rememberMe,
                         onChanged: (v) => setState(() => _rememberMe = v ?? true),
+                        activeColor: AppTheme.primaryColor,
                       ),
-                      const Text('Remember me'),
+                      Text(
+                        'Remember me',
+                        style: TextStyle(color: AppTheme.primaryColor),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 8),
@@ -155,6 +159,9 @@ class _RegisterPageState extends State<RegisterPage> {
                         onPressed: () {
                           context.go('/login');
                         },
+                        style: TextButton.styleFrom(
+                          foregroundColor: AppTheme.primaryColor,
+                        ),
                         child: const Text('Sign In'),
                       ),
                     ],
