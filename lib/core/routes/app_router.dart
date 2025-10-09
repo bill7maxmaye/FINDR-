@@ -28,6 +28,11 @@ import '../../features/notification/domain/usecases/get_notifications.dart';
 import '../../features/notification/domain/usecases/mark_notification_as_read.dart';
 import '../../features/notification/domain/usecases/mark_all_as_read.dart';
 import '../theme.dart';
+import '../../features/chat/presentation/pages/chat_list_page.dart';
+import '../../features/chat/presentation/pages/chat_page.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../features/chat/presentation/bloc/chat_bloc.dart';
+import '../../features/chat/presentation/bloc/chat_event.dart';
 
 class AppRouter {
   // Development flag - set to true to bypass authentication for testing
@@ -258,6 +263,29 @@ class AppRouter {
             child: Text('Booking Details Page - Coming Soon'),
           ),
         ),
+      ),
+      
+      // Chat routes
+      GoRoute(
+        path: '/chats',
+        name: 'chats',
+        builder: (context, state) => const ChatListPage(),
+      ),
+      GoRoute(
+        path: '/chat/:id',
+        name: 'chat',
+        builder: (context, state) {
+          final id = state.pathParameters['id']!;
+          final extra = state.extra as Map<String, dynamic>?;
+          return BlocProvider(
+            create: (_) => ChatBloc()..add(LoadConversation(id, peerName: extra?['peerName'] as String?, avatar: extra?['avatar'] as String?)),
+            child: ChatPage(
+              chatId: id,
+              peerName: extra?['peerName'] as String?,
+              avatar: extra?['avatar'] as String?,
+            ),
+          );
+        },
       ),
       
       // Root redirect

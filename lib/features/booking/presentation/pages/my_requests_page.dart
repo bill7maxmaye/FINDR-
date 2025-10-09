@@ -739,10 +739,13 @@ class _MyRequestsPageState extends State<MyRequestsPage> with TickerProviderStat
               width: double.infinity,
               child: ElevatedButton.icon(
                 onPressed: () {
-                  // TODO: Implement chat functionality
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Chat functionality coming soon')),
-                  );
+                  final chatId = request['id'] as String;
+                  final peerName = request['requesterName'] as String;
+                  final avatar = request['requesterAvatar'] as String;
+                  context.go('/chat/$chatId', extra: {
+                    'peerName': peerName,
+                    'avatar': avatar,
+                  });
                 },
                 icon: const Icon(Icons.chat, size: 16),
                 label: const Text('Start Chat'),
