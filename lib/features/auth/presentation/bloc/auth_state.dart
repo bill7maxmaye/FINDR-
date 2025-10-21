@@ -20,6 +20,12 @@ class AuthError extends AuthState {
   AuthError({required this.message});
 }
 
+class AuthLoginError extends AuthState {
+  final String message;
+
+  AuthLoginError({required this.message});
+}
+
 class AuthSuccess extends AuthState {
   final String message;
 

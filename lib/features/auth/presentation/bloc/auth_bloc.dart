@@ -5,6 +5,7 @@ import '../../domain/repositories/auth_repository.dart';
 import '../../domain/usecases/login_user.dart';
 import '../../domain/usecases/register_user.dart';
 import '../../domain/usecases/logout_user.dart';
+import '../../domain/exceptions/auth_exception.dart';
 import '../../../../core/network/dio_client.dart';
 import '../../../../core/utils/storage_service.dart';
 import 'auth_event.dart';
@@ -52,7 +53,15 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       ));
       emit(AuthAuthenticated(user: user));
     } catch (e) {
-      emit(AuthError(message: e.toString()));
+      String errorMessage = 'Login failed. Please try again.';
+      
+      if (e is AuthException) {
+        errorMessage = e.message;
+      } else {
+        errorMessage = e.toString();
+      }
+      
+      emit(AuthLoginError(message: errorMessage));
     }
   }
 

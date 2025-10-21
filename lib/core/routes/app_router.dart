@@ -13,7 +13,7 @@ import '../../features/booking/presentation/pages/bookings_page.dart';
 import '../../features/booking/presentation/pages/my_requests_page.dart';
 import '../../features/auth/presentation/pages/forgot_password_page.dart';
 import '../../features/auth/presentation/pages/reset_password_page.dart';
-import '../../features/auth/presentation/pages/verify_email_page.dart';
+import '../../features/auth/presentation/pages/email_verification_page.dart';
 import '../../features/location/presentation/pages/location_page.dart';
 import '../../features/location/presentation/pages/add_location_page.dart';
 import '../../features/location/presentation/pages/edit_location_page.dart';
@@ -242,8 +242,8 @@ class AppRouter {
       GoRoute(
         path: '/verify-email',
         name: 'verify-email',
-        builder: (context, state) => VerifyEmailPage(
-          token: state.uri.queryParameters['token'],
+        builder: (context, state) => EmailVerificationPage(
+          email: state.uri.queryParameters['email'],
         ),
       ),
       GoRoute(

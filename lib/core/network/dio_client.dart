@@ -16,6 +16,7 @@ class DioClient {
   // Backend base URL loaded from .env. Must be like: https://finder-backend-latest.onrender.com
   static String get baseUrl {
     final value = dotenv.env['baseUrl'];
+    print('Loaded baseUrl: $value');
     if (value == null || value.isEmpty) {
       throw StateError('Missing baseUrl in .env');
     }
@@ -28,9 +29,9 @@ class DioClient {
     final dio = Dio(
       BaseOptions(
         baseUrl: baseUrl,
-        connectTimeout: const Duration(seconds: 20),
-        receiveTimeout: const Duration(seconds: 20),
-        sendTimeout: const Duration(seconds: 20),
+        connectTimeout: const Duration(seconds: 30),
+        receiveTimeout: const Duration(seconds: 30),
+        sendTimeout: const Duration(seconds: 30),
         headers: {
           HttpHeaders.contentTypeHeader: 'application/json',
           HttpHeaders.acceptHeader: 'application/json',

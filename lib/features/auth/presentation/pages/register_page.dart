@@ -49,6 +49,11 @@ class _RegisterPageState extends State<RegisterPage> {
               SnackBar(
                 content: Text(state.message),
                 backgroundColor: AppTheme.errorColor,
+                duration: const Duration(seconds: 4),
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
               ),
             );
           } else if (state is AuthAuthenticated) {

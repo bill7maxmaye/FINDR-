@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import '../../../../core/network/dio_client.dart';
+import '../../domain/exceptions/auth_exception.dart';
 import '../models/user_model.dart';
 
 abstract class AuthApi {
@@ -22,19 +23,53 @@ class AuthApiImpl implements AuthApi {
   Future<Map<String, dynamic>> login(String email, String password, {bool rememberMe = false}) async {
     try {
       final dio = await _client.instance;
-      final res = await dio.post('/api/auth/sign-in/email', data: {
+      
+      final loginData = {
         'email': email,
         'password': password,
         'callbackURL': '',
         'rememberMe': rememberMe,
-      });
+      };
+      
+      final res = await dio.post('/api/auth/sign-in/email', data: loginData);
 
       if (res.statusCode == 200 && res.data is Map<String, dynamic>) {
         return res.data as Map<String, dynamic>;
       }
-      throw Exception('Login failed (${res.statusCode})');
+      
+      // Handle non-200 status codes (like 401)
+      if (res.data != null && res.data is Map<String, dynamic>) {
+        final responseData = res.data as Map<String, dynamic>;
+        
+        String errorMessage = 'Login failed. Please try again.';
+        
+        // Extract error message from response
+        if (responseData.containsKey('message') && responseData['message'] != null) {
+          errorMessage = responseData['message'] as String;
+        } else if (responseData.containsKey('code') && responseData['code'] == 'INVALID_EMAIL_OR_PASSWORD') {
+          errorMessage = 'Invalid email or password';
+        }
+        
+        throw AuthException(errorMessage);
+      }
+      
+      throw AuthException('Login failed (${res.statusCode})');
     } on DioException catch (e) {
-      throw Exception('Login failed: ${e.response?.data ?? e.message}');
+      // Extract specific error message from backend response
+      String errorMessage = 'Login failed. Please try again.';
+      
+      if (e.response?.data != null && e.response!.data is Map<String, dynamic>) {
+        final responseData = e.response!.data as Map<String, dynamic>;
+        
+        // Prioritize the backend's message field
+        if (responseData.containsKey('message') && responseData['message'] != null) {
+          errorMessage = responseData['message'] as String;
+        } else if (responseData.containsKey('code') && responseData['code'] == 'INVALID_EMAIL_OR_PASSWORD') {
+          errorMessage = 'Invalid email or password';
+        }
+      }
+      
+      throw AuthException(errorMessage);
     }
   }
 
@@ -50,8 +85,11 @@ class AuthApiImpl implements AuthApi {
         'callbackURL': '',
         'rememberMe': rememberMe,
       };
+
+    print('Collected Registration payload: $payload');
+
       final res = await dio.post('/api/auth/sign-up/email', data: payload);
-      print('Registration payload: $payload');
+      
       print('Registration response: ${res.data}');
 
       if (res.statusCode == 200 && res.data is Map<String, dynamic>) {
@@ -118,10 +156,15 @@ class AuthApiImpl implements AuthApi {
   Future<void> verifyEmail(String token) async {
     try {
       final dio = await _client.instance;
-      await dio.get('/api/auth/verify-email', queryParameters: {
+      print('Verifying email with token: $token');
+      print('Verification URL: ${dio.options.baseUrl}/auth/verify-email');
+      await dio.get('/auth/verify-email', queryParameters: {
         'token': token,
       });
     } on DioException catch (e) {
+      print('Email verification error: ${e.message}');
+      print('Response data: ${e.response?.data}');
+      print('Response status: ${e.response?.statusCode}');
       throw Exception('Email verification failed: ${e.response?.data ?? e.message}');
     }
   }
@@ -130,8 +173,12 @@ class AuthApiImpl implements AuthApi {
   Future<void> resendVerificationEmail() async {
     try {
       final dio = await _client.instance;
-      await dio.post('/api/auth/send-verification-email', data: {});
+      print('Sending verification email to: ${dio.options.baseUrl}/auth/send-verification-email');
+      await dio.post('/auth/send-verification-email', data: {});
     } on DioException catch (e) {
+      print('Resend verification email error: ${e.message}');
+      print('Response data: ${e.response?.data}');
+      print('Response status: ${e.response?.statusCode}');
       throw Exception('Resend verification email failed: ${e.response?.data ?? e.message}');
     }
   }

@@ -1,9 +1,12 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme.dart';
 import '../../../profile/presentation/widgets/profile_dropdown.dart';
+import '../../../auth/presentation/bloc/auth_bloc.dart';
+import '../../../auth/presentation/bloc/auth_state.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -126,33 +129,50 @@ class _HomeScreenState extends State<HomeScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 20),
-            Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
-                      Text(
-                        'Good morning!',
-                        style: TextStyle(fontSize: 16, color: Colors.grey),
+            BlocBuilder<AuthBloc, AuthState>(
+              builder: (context, state) {
+                String userName = 'User';
+                String userEmail = 'user@example.com';
+                String profileImageUrl = 'assets/images/person.jpg';
+                
+                if (state is AuthAuthenticated) {
+                  userName = state.user.fullName;
+                  userEmail = state.user.email;
+                  // Use user's image if available, otherwise default
+                  profileImageUrl = (state.user.profileImageUrl != null && state.user.profileImageUrl!.isNotEmpty)
+                      ? state.user.profileImageUrl!
+                      : 'assets/images/person.jpg';
+                }
+                
+                return Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Good morning!',
+                            style: TextStyle(fontSize: 16, color: Colors.grey),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            userName,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
+                            ),
+                          ),
+                        ],
                       ),
-                      SizedBox(height: 4),
-                      Text(
-                        'Ashley Robinson',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                ProfileDropdown(
-                  userName: 'Ashley Robinson',
-                  userEmail: 'ashley@example.com',
-                  profileImageUrl: 'assets/images/person.jpg',
-                ),
-              ],
+                    ),
+                    ProfileDropdown(
+                      userName: userName,
+                      userEmail: userEmail,
+                      profileImageUrl: profileImageUrl,
+                    ),
+                  ],
+                );
+              },
             ),
             const SizedBox(height: 18),
 

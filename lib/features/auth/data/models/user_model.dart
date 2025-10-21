@@ -15,17 +15,33 @@ class UserModel extends User {
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
+    // Support both our internal snake_case and backend camelCase keys
+    final fullName = (json['name'] as String?)?.trim();
+    String firstName = json['first_name'] as String? ?? '';
+    String lastName = json['last_name'] as String? ?? '';
+    if ((firstName.isEmpty && lastName.isEmpty) && fullName != null && fullName.isNotEmpty) {
+      final parts = fullName.split(' ');
+      firstName = parts.isNotEmpty ? parts.first : '';
+      lastName = parts.length > 1 ? parts.sublist(1).join(' ') : '';
+    }
+
+    final profileImageUrl = (json['profile_image_url'] as String?) ?? (json['image'] as String?);
+    final createdAtStr = (json['created_at'] as String?) ?? (json['createdAt'] as String?);
+    final updatedAtStr = (json['updated_at'] as String?) ?? (json['updatedAt'] as String?);
+    final isEmailVerified = (json['is_email_verified'] as bool?) ?? (json['emailVerified'] as bool?) ?? false;
+    final isActive = (json['is_active'] as bool?) ?? true;
+
     return UserModel(
       id: json['id'] as String,
       email: json['email'] as String,
-      firstName: json['first_name'] as String,
-      lastName: json['last_name'] as String,
+      firstName: firstName,
+      lastName: lastName,
       phoneNumber: json['phone_number'] as String?,
-      profileImageUrl: json['profile_image_url'] as String?,
-      createdAt: DateTime.parse(json['created_at'] as String),
-      updatedAt: DateTime.parse(json['updated_at'] as String),
-      isEmailVerified: json['is_email_verified'] as bool,
-      isActive: json['is_active'] as bool,
+      profileImageUrl: profileImageUrl,
+      createdAt: createdAtStr != null ? DateTime.parse(createdAtStr) : DateTime.now(),
+      updatedAt: updatedAtStr != null ? DateTime.parse(updatedAtStr) : DateTime.now(),
+      isEmailVerified: isEmailVerified,
+      isActive: isActive,
     );
   }
 

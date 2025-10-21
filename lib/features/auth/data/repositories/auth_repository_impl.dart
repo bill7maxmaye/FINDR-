@@ -33,7 +33,8 @@ class AuthRepositoryImpl implements AuthRepository {
       
       return user;
     } catch (e) {
-      throw Exception('Login failed: ${e.toString()}');
+      // Re-throw the original exception to preserve the error message
+      rethrow;
     }
   }
 
@@ -71,7 +72,7 @@ class AuthRepositoryImpl implements AuthRepository {
       
       return user;
     } catch (e) {
-      throw Exception('Registration failed: ${e.toString()}');
+      rethrow;
     }
   }
 
@@ -148,7 +149,7 @@ class AuthRepositoryImpl implements AuthRepository {
     try {
       await _authApi.forgotPassword(email);
     } catch (e) {
-      throw Exception('Forgot password request failed: ${e.toString()}');
+      rethrow;
     }
   }
 
@@ -157,7 +158,7 @@ class AuthRepositoryImpl implements AuthRepository {
     try {
       await _authApi.resetPassword(token, newPassword);
     } catch (e) {
-      throw Exception('Password reset failed: ${e.toString()}');
+      rethrow;
     }
   }
 
@@ -166,7 +167,7 @@ class AuthRepositoryImpl implements AuthRepository {
     try {
       await _authApi.verifyEmail(token);
     } catch (e) {
-      throw Exception('Email verification failed: ${e.toString()}');
+      rethrow;
     }
   }
 
@@ -175,7 +176,7 @@ class AuthRepositoryImpl implements AuthRepository {
     try {
       await _authApi.resendVerificationEmail();
     } catch (e) {
-      throw Exception('Resend verification email failed: ${e.toString()}');
+      rethrow;
     }
   }
 }
