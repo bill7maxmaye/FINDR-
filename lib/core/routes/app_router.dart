@@ -90,8 +90,12 @@ class AppRouter {
         name: 'categories',
         builder: (context, state) {
           final category = state.uri.queryParameters['category'];
+          final categoryId = state.uri.queryParameters['categoryId'];
+          final categoryName = state.uri.queryParameters['categoryName'];
           return CategoriesPage(
             mainCategory: category ?? '',
+            categoryId: categoryId,
+            categoryName: categoryName,
           );
         },
       ),

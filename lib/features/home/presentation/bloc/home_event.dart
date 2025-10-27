@@ -4,6 +4,15 @@ class HomeLoadServices extends HomeEvent {}
 
 class HomeLoadCategories extends HomeEvent {}
 
+class HomeLoadCategoriesFromAPI extends HomeEvent {}
+
+class HomeLoadSubcategories extends HomeEvent {
+  final String categoryId;
+  final String categoryName;
+
+  HomeLoadSubcategories({required this.categoryId, required this.categoryName});
+}
+
 class HomeSearchServices extends HomeEvent {
   final String query;
 
