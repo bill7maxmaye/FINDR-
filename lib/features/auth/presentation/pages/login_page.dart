@@ -1,3 +1,4 @@
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -9,6 +10,7 @@ import '../bloc/auth_state.dart';
 import '../widgets/auth_text_field.dart';
 import '../widgets/auth_button.dart';
 import '../widgets/auth_header.dart';
+import '../../../home/presentation/widgets/shimmer_loading.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -66,47 +68,52 @@ class _LoginPageState extends State<LoginPage> {
             context.go('/home');
           }
         },
-        child: SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24.0),
-            child: Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 480),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [],
-                  ),
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Column(
-                          children: [
-                            Image.asset(
-                              'assets/images/findr_logo.png',
-                              height: 72,
-                            ),
-                            const SizedBox(height: 12),
-                            const AuthHeader(
-                              title: 'Welcome Back',
-                              subtitle: 'Sign in to your account',
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 24),
-                        AuthTextField(
+        child: BlocBuilder<AuthBloc, AuthState>(
+          builder: (context, state) {
+            final bool isLoading = state is AuthLoading;
+            return Stack(
+              children: [
+                SafeArea(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(24.0),
+                    child: Center(
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 480),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).scaffoldBackgroundColor,
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: [],
+                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
+                          child: Form(
+                            key: _formKey,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Column(
+                                  children: [
+                                    Image.asset(
+                                      'assets/images/findr_logo.png',
+                                      height: 72,
+                                    ),
+                                    const SizedBox(height: 12),
+                                    const AuthHeader(
+                                      title: 'Welcome Back',
+                                      subtitle: 'Sign in to your account',
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 24),
+                                AuthTextField(
                     controller: _emailController,
                     labelText: 'Email',
                     keyboardType: TextInputType.emailAddress,
                     validator: Validators.validateEmail,
                     prefixIcon: Icons.email_outlined,
                   ),
-                        const SizedBox(height: 16),
-                        AuthTextField(
+                                const SizedBox(height: 16),
+                                AuthTextField(
                     controller: _passwordController,
                     labelText: 'Password',
                     obscureText: _obscurePassword,
@@ -123,63 +130,76 @@ class _LoginPageState extends State<LoginPage> {
                       },
                     ),
                   ),
-                        const SizedBox(height: 8),
-                        Row(
-                          children: [
-                            Checkbox(
-                              value: _rememberMe,
-                              onChanged: (v) => setState(() => _rememberMe = v ?? true),
-                              activeColor: AppTheme.primaryColor,
+                                const SizedBox(height: 8),
+                                Row(
+                                  children: [
+                                    Checkbox(
+                                      value: _rememberMe,
+                                      onChanged: (v) => setState(() => _rememberMe = v ?? true),
+                                      activeColor: AppTheme.primaryColor,
+                                    ),
+                                    Text(
+                                      'Remember me',
+                                      style: TextStyle(color: AppTheme.primaryColor),
+                                    ),
+                                    const Spacer(),
+                                    TextButton(
+                                      onPressed: () {
+                                        context.go('/forgot-password');
+                                      },
+                                      style: TextButton.styleFrom(
+                                        foregroundColor: AppTheme.primaryColor,
+                                      ),
+                                      child: const Text('Forgot Password?'),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 16),
+                                AuthButton(
+                                  text: 'Sign In',
+                                  isLoading: false,
+                                  onPressed: _handleLogin,
+                                ),
+                                const SizedBox(height: 16),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Text("Don't have an account? "),
+                                    TextButton(
+                                      onPressed: () {
+                                        context.go('/register');
+                                      },
+                                      style: TextButton.styleFrom(
+                                        foregroundColor: AppTheme.primaryColor,
+                                      ),
+                                      child: const Text('Sign Up'),
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ),
-                            Text(
-                              'Remember me',
-                              style: TextStyle(color: AppTheme.primaryColor),
-                            ),
-                            const Spacer(),
-                            TextButton(
-                              onPressed: () {
-                                context.go('/forgot-password');
-                              },
-                              style: TextButton.styleFrom(
-                                foregroundColor: AppTheme.primaryColor,
-                              ),
-                              child: const Text('Forgot Password?'),
-                            ),
-                          ],
+                          ),
                         ),
-                        const SizedBox(height: 16),
-                        BlocBuilder<AuthBloc, AuthState>(
-                          builder: (context, state) {
-                            return AuthButton(
-                              text: 'Sign In',
-                              isLoading: state is AuthLoading,
-                              onPressed: _handleLogin,
-                            );
-                          },
-                        ),
-                        const SizedBox(height: 16),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Text("Don't have an account? "),
-                            TextButton(
-                              onPressed: () {
-                                context.go('/register');
-                              },
-                              style: TextButton.styleFrom(
-                                foregroundColor: AppTheme.primaryColor,
-                              ),
-                              child: const Text('Sign Up'),
-                            ),
-                          ],
-                        ),
-                      ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ),
-          ),
+                if (isLoading) ...[
+                  Positioned.fill(
+                    child: BackdropFilter(
+                      filter: ui.ImageFilter.blur(sigmaX: 1, sigmaY: 1),
+                      child: Container(
+                        color: Colors.black.withOpacity(0.04),
+                      ),
+                    ),
+                  ),
+                  const Center(
+                    child: UltraBeautifulLoadingIndicator(),
+                  ),
+                ],
+              ],
+            );
+          },
         ),
       ),
     );

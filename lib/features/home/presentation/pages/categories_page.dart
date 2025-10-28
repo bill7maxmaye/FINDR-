@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:ui' as ui;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme.dart';
@@ -115,7 +116,9 @@ class _CategoriesPageState extends State<CategoriesPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return Stack(
+      children: [
+        Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         
@@ -216,13 +219,50 @@ class _CategoriesPageState extends State<CategoriesPage> {
                   : BlocBuilder<HomeBloc, HomeState>(
                       builder: (context, state) {
                         if (state is HomeLoading) {
-                          return const UltraBeautifulLoadingIndicator(
-                            message: 'Loading subcategories...',
-                            subtitle: 'Fetching the latest services for this category',
-                            previewWidget: _SubcategoryPreviewSkeleton(),
-                          );
-                        } else if (state is HomeLoaded && state.subcategories.isNotEmpty) {
-                          return _buildCategoriesGridFromBloc(state.subcategories);
+                          // Global overlay already shows spinner; avoid duplicate
+                          return const SizedBox.shrink();
+                        } else if (state is HomeLoaded) {
+                          // If a specific category is selected, ensure we only render its subcategories
+                          if (widget.categoryId != null && widget.categoryId!.isNotEmpty) {
+                            // Determine if current state's subcategories belong to this page's category
+                            final hasCurrentCategoryData = state.subcategories.isNotEmpty &&
+                                (state.subcategories.first['mainCategory'] ==
+                                    (widget.categoryName ?? widget.mainCategory));
+
+                            if (!hasCurrentCategoryData) {
+                              // Global overlay already shows spinner; avoid duplicate
+                              return const SizedBox.shrink();
+                            }
+
+                            return _buildCategoriesGridFromBloc(state.subcategories);
+                          }
+
+                          // Otherwise, aggregate all subcategories from all categories (See All flow)
+                          final List<Map<String, dynamic>> allApiSubcategories = [];
+                          if (state.apiCategories.isNotEmpty) {
+                            for (final category in state.apiCategories) {
+                              if (category['subCategories'] != null && category['subCategories'] is List) {
+                                final subCategories = category['subCategories'] as List<dynamic>;
+                                for (final sub in subCategories) {
+                                  allApiSubcategories.add({
+                                    'name': sub['name'] ?? '',
+                                    'description': sub['description'] ?? '',
+                                    'icon': sub['icon'] ?? '🧹',
+                                    'id': sub['id'] ?? '',
+                                    'mainCategory': category['name'] ?? '',
+                                    'categoryId': category['id'] ?? '',
+                                  });
+                                }
+                              }
+                            }
+                          }
+
+                          if (allApiSubcategories.isNotEmpty) {
+                            return _buildCategoriesGridFromBloc(allApiSubcategories);
+                          }
+
+                          // Fallback empty state
+                          return _buildCategoriesGrid();
                         } else {
                           return _buildCategoriesGrid();
                         }
@@ -232,6 +272,35 @@ class _CategoriesPageState extends State<CategoriesPage> {
           ],
         ),
       ),
+    ),
+        // Full-screen loading overlay with blur to include AppBar
+        BlocBuilder<HomeBloc, HomeState>(
+          builder: (context, state) {
+            final bool needsGlobalOverlay = state is HomeLoading ||
+                (state is HomeLoaded && widget.categoryId != null && widget.categoryId!.isNotEmpty &&
+                  (state.subcategories.isEmpty || state.subcategories.first['mainCategory'] != (widget.categoryName ?? widget.mainCategory)));
+            if (!needsGlobalOverlay) return const SizedBox.shrink();
+            return Positioned.fill(
+              child: IgnorePointer(
+                ignoring: false,
+                child: Stack(
+                  children: [
+                    Positioned.fill(
+                      child: ClipRect(
+                        child: BackdropFilter(
+                          filter: ui.ImageFilter.blur(sigmaX: 1, sigmaY: 1),
+                          child: const ColoredBox(color: Color(0x0A000000)),
+                        ),
+                      ),
+                    ),
+                    const Center(child: UltraBeautifulLoadingIndicator()),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
+      ],
     );
   }
 

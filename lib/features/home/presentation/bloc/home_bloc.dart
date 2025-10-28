@@ -54,6 +54,11 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   ) async {
     try {
       print('HomeBloc: Loading categories from API...');
+      // Show loading overlay on first load or when we don't have categories yet
+      final bool hasCategories = state is HomeLoaded && (state as HomeLoaded).apiCategories.isNotEmpty;
+      if (!hasCategories) {
+        emit(HomeLoading());
+      }
       final response = await _categoriesApi.getAllCategories();
       
       if (response.containsKey('data') && response['data'] is List) {
@@ -90,6 +95,18 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     Emitter<HomeState> emit,
   ) async {
     try {
+      // Clear previous subcategories without putting the whole app into loading
+      if (state is HomeLoaded) {
+        final s = state as HomeLoaded;
+        emit(HomeLoaded(
+          services: s.services,
+          categories: s.categories,
+          apiCategories: s.apiCategories,
+          subcategories: const [],
+          selectedCategory: s.selectedCategory,
+          searchQuery: s.searchQuery,
+        ));
+      }
       print('HomeBloc: Loading subcategories for category: ${event.categoryId}');
       final response = await _categoriesApi.getSubcategoriesByCategory(event.categoryId);
       
@@ -104,14 +121,14 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         }).toList();
 
         if (state is HomeLoaded) {
-          final currentState = state as HomeLoaded;
+          final s = state as HomeLoaded;
           emit(HomeLoaded(
-            services: currentState.services,
-            categories: currentState.categories,
-            apiCategories: currentState.apiCategories,
+            services: s.services,
+            categories: s.categories,
+            apiCategories: s.apiCategories,
             subcategories: mappedSubcategories,
-            selectedCategory: currentState.selectedCategory,
-            searchQuery: currentState.searchQuery,
+            selectedCategory: s.selectedCategory,
+            searchQuery: s.searchQuery,
           ));
         }
         print('HomeBloc: Loaded ${mappedSubcategories.length} subcategories from API');

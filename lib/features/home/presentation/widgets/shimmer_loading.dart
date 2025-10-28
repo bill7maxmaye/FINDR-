@@ -91,13 +91,13 @@ class _ShimmerLoadingState extends State<ShimmerLoading>
 }
 
 class BeautifulLoadingIndicator extends StatefulWidget {
-  final String message;
-  final String? subtitle;
+  final String? message; // optional
+  final String? subtitle; // optional
   final Widget? previewWidget;
 
   const BeautifulLoadingIndicator({
     Key? key,
-    required this.message,
+    this.message,
     this.subtitle,
     this.previewWidget,
   }) : super(key: key);
@@ -273,49 +273,51 @@ class _BeautifulLoadingIndicatorState extends State<BeautifulLoadingIndicator>
               );
             },
           ),
-          const SizedBox(height: 32),
-          // Animated text
-          FadeTransition(
-            opacity: _fadeAnimation,
-            child: Column(
-              children: [
-                // Main message with gradient text
-                ShaderMask(
-                  shaderCallback: (bounds) => LinearGradient(
-                    colors: [
-                      AppTheme.primaryColor,
-                      AppTheme.primaryColor.withOpacity(0.7),
-                    ],
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
-                  ).createShader(bounds),
-                  child: Text(
-                    widget.message,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 0.5,
+          if (widget.message != null || widget.subtitle != null) ...[
+            const SizedBox(height: 32),
+            // Animated text (optional)
+            FadeTransition(
+              opacity: _fadeAnimation,
+              child: Column(
+                children: [
+                  if (widget.message != null)
+                    ShaderMask(
+                      shaderCallback: (bounds) => LinearGradient(
+                        colors: [
+                          AppTheme.primaryColor,
+                          AppTheme.primaryColor.withOpacity(0.7),
+                        ],
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                      ).createShader(bounds),
+                      child: Text(
+                        widget.message!,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.5,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
                     ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-                if (widget.subtitle != null) ...[
-                  const SizedBox(height: 12),
-                  Text(
-                    widget.subtitle!,
-                    style: TextStyle(
-                      color: Colors.grey[600],
-                      fontSize: 14,
-                      fontWeight: FontWeight.w400,
-                      letterSpacing: 0.3,
+                  if (widget.subtitle != null) ...[
+                    const SizedBox(height: 12),
+                    Text(
+                      widget.subtitle!,
+                      style: TextStyle(
+                        color: Colors.grey[600],
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400,
+                        letterSpacing: 0.3,
+                      ),
+                      textAlign: TextAlign.center,
                     ),
-                    textAlign: TextAlign.center,
-                  ),
+                  ],
                 ],
-              ],
+              ),
             ),
-          ),
+          ],
           if (widget.previewWidget != null) ...[
             const SizedBox(height: 40),
             FadeTransition(
@@ -361,13 +363,13 @@ class _LoadingSpinnerPainter extends CustomPainter {
 
 // Ultra-beautiful loading indicator with particle effects
 class UltraBeautifulLoadingIndicator extends StatefulWidget {
-  final String message;
-  final String? subtitle;
+  final String? message; // optional
+  final String? subtitle; // optional
   final Widget? previewWidget;
 
   const UltraBeautifulLoadingIndicator({
     Key? key,
-    required this.message,
+    this.message,
     this.subtitle,
     this.previewWidget,
   }) : super(key: key);
@@ -541,59 +543,61 @@ class _UltraBeautifulLoadingIndicatorState extends State<UltraBeautifulLoadingIn
               );
             },
           ),
-          const SizedBox(height: 40),
-          // Animated text with enhanced styling
-          FadeTransition(
-            opacity: _textFadeAnimation,
-            child: Column(
-              children: [
-                // Main message with enhanced gradient
-                ShaderMask(
-                  shaderCallback: (bounds) => LinearGradient(
-                    colors: [
-                      AppTheme.primaryColor,
-                      AppTheme.primaryColor.withOpacity(0.8),
-                      AppTheme.primaryColor.withOpacity(0.6),
-                    ],
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
-                  ).createShader(bounds),
-                  child: Text(
-                    widget.message,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 1.0,
-                      height: 1.2,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-                if (widget.subtitle != null) ...[
-                  const SizedBox(height: 16),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: Colors.grey[100],
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: Colors.grey[300]!, width: 1),
-                    ),
-                    child: Text(
-                      widget.subtitle!,
-                      style: TextStyle(
-                        color: Colors.grey[700],
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        letterSpacing: 0.5,
+          if (widget.message != null || widget.subtitle != null) ...[
+            const SizedBox(height: 40),
+            // Animated text with enhanced styling (optional)
+            FadeTransition(
+              opacity: _textFadeAnimation,
+              child: Column(
+                children: [
+                  if (widget.message != null)
+                    ShaderMask(
+                      shaderCallback: (bounds) => LinearGradient(
+                        colors: [
+                          AppTheme.primaryColor,
+                          AppTheme.primaryColor.withOpacity(0.8),
+                          AppTheme.primaryColor.withOpacity(0.6),
+                        ],
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                      ).createShader(bounds),
+                      child: Text(
+                        widget.message!,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 1.0,
+                          height: 1.2,
+                        ),
+                        textAlign: TextAlign.center,
                       ),
-                      textAlign: TextAlign.center,
                     ),
-                  ),
+                  if (widget.subtitle != null) ...[
+                    const SizedBox(height: 16),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[100],
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: Colors.grey[300]!, width: 1),
+                      ),
+                      child: Text(
+                        widget.subtitle!,
+                        style: TextStyle(
+                          color: Colors.grey[700],
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          letterSpacing: 0.5,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ],
                 ],
-              ],
+              ),
             ),
-          ),
+          ],
           if (widget.previewWidget != null) ...[
             const SizedBox(height: 50),
             FadeTransition(

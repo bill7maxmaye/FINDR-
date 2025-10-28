@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:ui' as ui;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme.dart';
@@ -88,7 +89,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return Stack(
+      children: [
+        Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         //use theme data
@@ -247,17 +250,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     }).toList(),
                   );
                 } else if (state is HomeLoading) {
-                  return const UltraBeautifulLoadingIndicator(
-                    message: 'Loading categories...',
-                    subtitle: 'Fetching the latest services',
-                    previewWidget: _CategoryPreviewSkeleton(),
-                  );
+                  // Use global page overlay; render nothing here to avoid duplicate spinner
+                  return const SizedBox.shrink();
                 } else {
-                  return const UltraBeautifulLoadingIndicator(
-                    message: 'Loading categories...',
-                    subtitle: 'Fetching the latest services',
-                    previewWidget: _CategoryPreviewSkeleton(),
-                  );
+                  // Fallback when no categories yet; avoid local spinner
+                  return const SizedBox.shrink();
                 }
               },
             ),
@@ -350,6 +347,37 @@ class _HomeScreenState extends State<HomeScreen> {
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
         ],
       ),
+        ),
+        // Full-screen loading overlay with blur (covers AppBar as well)
+        BlocBuilder<HomeBloc, HomeState>(
+          builder: (context, state) {
+            final bool needsGlobalOverlay =
+                (state is HomeLoading) ||
+                (state is HomeLoaded && state.apiCategories.isEmpty);
+            if (!needsGlobalOverlay) return const SizedBox.shrink();
+            return Positioned.fill(
+              child: IgnorePointer(
+                ignoring: false,
+                child: Stack(
+                  children: [
+                    Positioned.fill(
+                      child: ClipRect(
+                        child: BackdropFilter(
+                          filter: ui.ImageFilter.blur(sigmaX: 1, sigmaY: 1),
+                          child: Container(
+                            color: Colors.black.withOpacity(0.04),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const Center(child: UltraBeautifulLoadingIndicator()),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
+      ],
     );
   }
 
