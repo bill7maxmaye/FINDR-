@@ -11,7 +11,7 @@ class CategoriesApi {
       print('Categories API: Fetching all categories...');
       print('Categories API URL: ${dio.options.baseUrl}/categories');
       
-      final response = await dio.get('/categories');
+      final response = await dio.get('/api/categories');
       
       print('Categories response status: ${response.statusCode}');
       print('Categories response data: ${response.data}');
@@ -37,7 +37,7 @@ class CategoriesApi {
       print('Categories API: Fetching subcategories for category: $categoryId');
       print('Categories API URL: ${dio.options.baseUrl}/categories/$categoryId/subcategories');
       
-      final response = await dio.get('/categories/$categoryId/subcategories');
+      final response = await dio.get('/api/categories/$categoryId/subcategories');
       
       print('Subcategories response status: ${response.statusCode}');
       print('Subcategories response data: ${response.data}');
