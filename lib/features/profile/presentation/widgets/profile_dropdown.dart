@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme.dart';
+import '../../../../core/widgets/logout_confirmation_dialog.dart';
+import '../../../auth/presentation/bloc/auth_bloc.dart';
+import '../../../auth/presentation/bloc/auth_event.dart';
+import '../../../auth/presentation/bloc/auth_state.dart';
 
 class ProfileDropdown extends StatelessWidget {
   final String userName;
@@ -32,7 +37,7 @@ class ProfileDropdown extends StatelessWidget {
             context.go('/manage-account');
             break;
           case 'sign-out':
-            _showSignOutDialog(context);
+            _showLogoutConfirmation(context);
             break;
         }
       },
@@ -169,30 +174,12 @@ class ProfileDropdown extends StatelessWidget {
     );
   }
 
-  void _showSignOutDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Sign Out'),
-        content: const Text('Are you sure you want to sign out?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              // TODO: Implement sign out logic
-              context.go('/login');
-            },
-            child: const Text(
-              'Sign Out',
-              style: TextStyle(color: AppTheme.errorColor),
-            ),
-          ),
-        ],
-      ),
-    );
+  void _showLogoutConfirmation(BuildContext context) async {
+    final result = await LogoutConfirmationDialog.show(context);
+    // Dialog handles logout internally
+    // Router will automatically redirect to login when state becomes AuthUnauthenticated
+    if (result == true && context.mounted) {
+      context.go('/login');
+    }
   }
 }
